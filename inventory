@@ -1,0 +1,15 @@
+redhat:
+  hosts:
+    pgprod:
+    server_ansible:
+    server_centos:
+    server_rhel:
+    msi:
+
+debian:
+  hosts:
+    server_ubuntu:
+
+laptops:
+  hosts:
+    msi:
