@@ -26,6 +26,7 @@
 *__pycache__*
 __pycache__/
 .DS_Store
+ansible-navigator.log
 
 # Ignore Virtual Env Folder
 /SQLMonitorVenv/*
