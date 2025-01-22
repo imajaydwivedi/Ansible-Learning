@@ -1,3 +1,10 @@
+ansible_vms:
+  hosts:
+    server_ansible:
+    server_centos:
+    server_rhel:
+    server_ubuntu:
+
 redhat:
   hosts:
     pgprod:
@@ -12,4 +19,9 @@ debian:
 
 laptops:
   hosts:
+    msi:
+
+postgres:
+  hosts:
+    pgprod:
     msi:
