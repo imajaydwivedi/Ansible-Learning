@@ -44,8 +44,20 @@ Playbook Development Strategy
 -> After defining the generic structure of the playbook, focus on specific modules
     and their arguments.
 
-Sample- 
 
+Running Your First Playbook
+--------------------------------------
+
+-> Use "ansible-playbook vsftpd.yml" to tun the playbook, or "ansible-navigator run vsftpd.yml"
+    if you prefer working with naviagor.
+
+-> A successful run requires a functional ansible.cfg and inventory file to be available;
+    alternatively, required options can be provided as command line arguments.
+
+
+Sample-
+
+ansible-playbook ./ansible-core-concepts-and-advanced-features/using-ansible-playbooks/example.yml
 
 
 UNDERSTANDING_PLAYBOOK_STRUCTURE_COMMENTS

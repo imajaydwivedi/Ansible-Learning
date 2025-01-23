@@ -7,7 +7,7 @@
       ansible.builtin.debug:
         msg: this is message one
     - name: This is task two
-      ansible.builtin.debug:
+      debug:
         msg: This is message two
 
 - name: This is play two
