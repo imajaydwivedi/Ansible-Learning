@@ -1,0 +1,10 @@
+---
+- name: variables demo on redhat vms
+  gather_facts: no
+  hosts: redhat
+  tasks:
+    - name: creating user {{ myuser }}
+      # ansible-doc --list | grep -i user
+      ansible.builtin.user:
+        name: "{{ myuser }}"
+        shell: /bin/bash

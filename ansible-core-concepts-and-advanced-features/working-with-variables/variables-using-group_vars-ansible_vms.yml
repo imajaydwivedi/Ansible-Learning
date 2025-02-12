@@ -1,0 +1,10 @@
+---
+- name: variables demo on ansible_vms
+  gather_facts: no
+  hosts: ansible_vms
+  tasks:
+    - name: creating user {{ myuser }}
+      # ansible-doc --list | grep -i user
+      ansible.builtin.user:
+        name: "{{ myuser }}"
+        shell: /bin/bash

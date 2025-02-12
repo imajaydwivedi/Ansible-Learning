@@ -25,3 +25,7 @@ postgres:
   hosts:
     pgprod:
     msi:
+
+desktop:
+  hosts:
+    localhost:

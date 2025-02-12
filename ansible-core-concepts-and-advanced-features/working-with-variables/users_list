@@ -1,0 +1,13 @@
+users:
+  - username: ajay
+    homedir: /home/ajay
+    shell: /bin/bash
+    groups: wheel
+  - username: anant
+    homedir: /home/anant
+    shell: /bin/bash
+    groups: users
+  - username: saanvi
+    homedir: /home/saanvi
+    shell: /bin/bash
+    groups: users
