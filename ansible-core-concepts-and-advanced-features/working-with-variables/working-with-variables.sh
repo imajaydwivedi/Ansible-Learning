@@ -347,7 +347,8 @@ Example:
 echo 'password' > vault-pass
 chmod 600 vault-pass
 
-ansible-playbook --vault-password-file=ansible-core-concepts-and-advanced-features/working-with-variables/vault-pass ansible-core-concepts-and-advanced-features/working-with-variables/create-user.yml
+ansible-playbook --vault-password-file=ansible-core-concepts-and-advanced-features/working-with-variables/vault-pass \
+    ansible-core-concepts-and-advanced-features/working-with-variables/create-user.yml
 
 WORKING_WITH_VARIABLES
 
