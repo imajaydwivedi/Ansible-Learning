@@ -23,4 +23,6 @@
         name: httpd
         state: restarted
 
-
+# ansible localhost -m file -a "path=/tmp/index.html state=touch"
+# ansible server_ansible -m file -a "name=/var/www/html/index.html state=absent"
+# ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/setup_web_server.yml

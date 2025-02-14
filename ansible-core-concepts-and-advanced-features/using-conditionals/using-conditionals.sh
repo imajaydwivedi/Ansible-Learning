@@ -143,11 +143,121 @@ Using Handlers
 
 Example:
 
-# create /tmp/index.html on managed host
-ansible server_ansible -m file -a "path=/tmp/index.html state=touch"
+# create /tmp/index.html on controller node
+ansible localhost -m file -a "path=/tmp/index.html state=touch"
 
 # Run playbook
 ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/setup_web_server.yml
+
+# Enable "force_handlers" attribute
+
+# Re-run the playbook with force_handlers enabled
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/setup_web_server.yml
+
+# To trigger handler, a change in task is required. So remove the dest file
+ansible server_ansible -m file -a "name=/var/www/html/index.html state=absent"
+
+
+Using ansible.builtin.meta module
+-------------------------------------------------
+
+-> Handlers are executed at the end of the play
+
+-> To change this behaviour, the "ansible.builtin.meta" module can be used.
+
+-> This module specifies options to influence the Ansible internal execution order:
+    -> flush_handlers: will run all notified handlers now
+    -> refresh_inventory: refreshes inventory at the moment it is called
+    -> clear_facts: removes all facts
+    -> end_host: ends playbook execution for this host
+
+
+Using when to Run Tasks in Specific Situations
+-----------------------------------------------------------
+
+-> "when" statemements are used to run a task conditionally.
+
+-> "when" can be used to run a task only if specific conditions are true.
+
+-> Playbook variables, registered variables, and facts can be used to check conditions in "when" statements.
+
+-> For instance, check if a task has run successfully, a certain amount if memory is available,
+    a file exists, etc.
+
+-> When using "when", it is important to address the right variable type.
+
+
+Example Conditionals
+------------------------------
+
+ansible_machine == "x86_64"                 :  Variable value is a string
+ansible_distribution_version == "8"         :  Variable value is a string
+ansible_memfree_mb == 1024                  :  Variable value is equal to integer
+ansible_memfree_mb < 256                    :  Variable value is smaller than integer
+ansible_memfree_mb > 256                    :  Variable value is bigger than integer
+ansible_memfree_mb <= 256                   :  Variable value is smaller than or equal to integer
+ansible_memfree_mb != 512                   :  Variable value is not integer
+my_variable is defined                      :  Variable exists (nice for facts)
+my_variable is not defined                  :  Variable does not exist
+my_variable                                 :  Variable is Boolean true
+ansible_distribution in supported_distros   :  Variable contains another variable
+
+
+
+Understanding Variables Types
+---------------------------------------------
+
+-> String: sequence of characters - the default variable type in Ansible
+-> Numbers: numeric value, treated as integer or float. A number placed in quotes is treated as a string.
+-> Booleans: true/false values (yes/no, y/n, on/off also supported)
+-> Dates: calender dates
+-> Null: undefined variable type
+-> List or Arrays: a sorted collection of values
+-> Dictionary or Hash: a collection of key/value pairs
+
+
+Using Filters to Enforce Variable Types
+---------------------------------------------------
+
+-> While working with variables in a "when" statement, the variable type may be interpreted wrongly.
+
+-> To ensure that a variable is treated as a specific type, filters can be  used
+  -> int (integer)
+      when vgsize | int > 5
+  -> bool (boolean)
+      when runme | bool
+
+-> Using a filter does not change the variable type, it only changes the way it is interpreted.
+
+Example -
+
+ansible server_ansible -m setup -a "filter=ansible_date_time"
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/distro.yml
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/weekday_test.yml
+
+
+Testing Multiple Conditions
+-----------------------------------------
+
+-> "when" can be used to test multiple conditions as well.
+
+-> use "and" or "or" and group the conditions with parentheses.
+
+------------
+when: ansible_distribution == "CentOS" or ansible_distribution == "Redhat"
+when: ansible_machine == "x86_64" and ansible_distribution == "CentOS"
+------------
+
+-> The "when" keyword also supports a list and when using a list, all of the conditions must be true.
+
+-> Complex conditional statements can be group conditions using parentheses.
+
+Example -
+
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/when_multiple.yml
+
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/if_size.yml
+
 
 USING_CONDITIONALS_COMMENTS
 
