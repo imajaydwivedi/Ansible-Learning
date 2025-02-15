@@ -259,6 +259,84 @@ ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/
 ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/if_size.yml
 
 
+Using Register Conditionally
+-------------------------------------------------
+
+-> The "register" keyword is used to store the results of a command or tasks.
+
+-> Next, "when" can be used to run a task only if a specific result was found.
+
+-------------
+- name: show register on random module
+  user:
+    name: "{{ username }}"
+  register: user
+- name: show register results
+  debug:
+    var: user
+  when: user is defined
+-------------
+
+Example:
+
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/register.yml
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/find_user.yml
+
+
+Using Blocks
+-------------------------
+
+-> A block is a logical group of tasks
+
+-> It can be used to control how tasks are executed.
+
+-> For instance, one block can be enabled using a single "when".
+
+-> Notice that "items" cannot be used on blocks.
+
+-> Blocks can be used in error condition handling:
+  -> Use "block" to define the main tasks to run.
+  -> Use "rescue" to define tasks that run if tasks defined in the block fail.
+  -> Use "always" to define tasks that will always run
+
+----------------
+- name: using blocks
+  hosts: ansible_vms
+  tasks:
+  - name: intended to be successful
+    block:
+    - name: remove a file
+      shell:
+        cmd: rm /var/www/html/index.html
+    rescue:
+    - name: create a file
+      shell:
+        cmd: touch /tmp/rescuefile
+----------------
+
+Example -
+
+ansible all -m setup -a "filter=ansible_os_family"
+ansible all -m setup | grep -i family
+ansible all -m setup | less
+
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/blocks.yml
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/blocks-2.yml
+
+
+Using the "assert" Module
+--------------------------------------
+
+-> The "assert" module can be used to show a message on success and on failure.
+
+-> It's a bit like the "fail" module, but with more advanced options.
+
+Example -
+
+ansible server_ansible -m stat -a 'path=/etc/hosts'
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/assertstat.yml
+ansible-playbook ansible-core-concepts-and-advanced-features/using-conditionals/assertsize-wrong.yml
+
 USING_CONDITIONALS_COMMENTS
 
 
