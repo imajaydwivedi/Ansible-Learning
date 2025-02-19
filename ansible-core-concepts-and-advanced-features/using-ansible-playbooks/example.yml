@@ -1,0 +1,19 @@
+---
+- name: This is play one
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: This is task one
+      ansible.builtin.debug:
+        msg: this is message one
+    - name: This is task two
+      debug:
+        msg: This is message two
+
+- name: This is play two
+  hosts: localhost
+  become: true
+  tasks:
+    - name: This is task three
+      ansible.builtin.debug:
+        msg: This is message three

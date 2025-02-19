@@ -1,0 +1,20 @@
+---
+- name: Error Demo
+  hosts: server_ansible
+  #gather_facts: false
+  #ignore_errors: true
+  tasks:
+    - name: Copy a file
+      copy:
+        src: /tmp/hello
+        dest: /tmp/
+    - name: Showing syntax error
+    # introducing syntax error here
+       debug:
+      # 3 space here
+         msg: This is a syntax error
+    - name: Running this
+      debug:
+      # only 2 space here
+        msg: Running this as last task
+
