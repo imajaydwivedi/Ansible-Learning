@@ -1,0 +1,10 @@
+{% for host in groups['ansible_vms'] %}
+{{ hostvars[host]['ansible_os_family'] }} host "{{ hostvars[host]['ansible_hostname'] }}" has {{ hostvars[host]['ansible_default_ipv4']['address'] }} ip.
+{% endfor %}
+
+
+{% for host in groups['ansible_vms'] %}
+   {# ansible localhost -m setup -a 'filter=ansible_default_ipv4' #}
+   {# ansible localhost -m setup -a 'filter=ansible_hostname' #}
+   {# ansible localhost -m setup -a 'filter=ansible_os_family' #}
+{% endfor %}

@@ -312,7 +312,7 @@ Using Blocks
     - name: create a file
       shell:
         cmd: touch /tmp/rescuefile
-----------------
+----------------  
 
 Example -
 
