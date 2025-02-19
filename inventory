@@ -29,3 +29,7 @@ postgres:
 desktop:
   hosts:
     localhost:
+
+macbook:
+  hosts:
+    officelaptop
