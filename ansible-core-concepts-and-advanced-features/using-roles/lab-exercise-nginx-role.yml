@@ -1,0 +1,16 @@
+---
+- name: install nginx
+  hosts: redhat
+  pre_tasks:
+    - name: remove httpd service package
+      ansible.builtin.dnf:
+        name: httpd
+        state: absent
+    - name: update to latest
+      ansible.builtin.dnf:
+        name: '*'
+        state: latest
+  roles:
+  - geerlingguy.nginx
+  post_tasks:
+  - command: dnf clean all

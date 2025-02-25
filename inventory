@@ -11,11 +11,11 @@ redhat:
     server_ansible:
     server_centos:
     server_rhel:
-    msi:
 
 debian:
   hosts:
     server_ubuntu:
+    msi:
 
 laptops:
   hosts:
