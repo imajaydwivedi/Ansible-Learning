@@ -4,6 +4,7 @@ ansible_vms:
     server_centos:
     server_rhel:
     server_ubuntu:
+    server_desktop:
 
 redhat:
   hosts:
@@ -15,6 +16,7 @@ redhat:
 debian:
   hosts:
     server_ubuntu:
+    server_desktop:
     msi:
 
 laptops:

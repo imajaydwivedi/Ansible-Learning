@@ -1,0 +1,11 @@
+---
+- name: modify sudoers
+  gather_facts: false
+  hosts: server_desktop
+  tasks:
+  - name: modifying /etc/sudoers
+    ansible.builtin.lineinfile:
+      path: /etc/sudoers
+      regexp: '^Defaults'
+      line: 'Defaults timestamp_type=global,timestamp_timeout=240'
+      validate:  /usr/sbin/visudo -cf %s
