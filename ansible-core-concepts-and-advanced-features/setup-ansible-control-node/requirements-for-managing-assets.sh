@@ -21,6 +21,12 @@ About "sudo" Privileges
   More help on -
   https://github.com/imajaydwivedi/Linux-Learning/blob/main/Fundamentals/configuring-sudo.sh
 
+#> cat /etc/sudoers.d/ansible
+  ansible ALL=(ALL) NOPASSWD:ALL
+
+#> ansible server_desktop -m copy -a "src=/etc/sudoers.d/ansible dest=/etc/sudoers.d/ansible" -b -K
+#> ansible server_desktop -a "ls -l /etc/sudoers.d/ansible"
+
 -> This option should never be used in real life, as it makes your configuration insecure.
 
 -> To securely escalate privileges using passwords, add the following to /etc/sudoers

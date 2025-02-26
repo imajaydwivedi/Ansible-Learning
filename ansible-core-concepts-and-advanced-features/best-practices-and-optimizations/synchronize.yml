@@ -1,0 +1,20 @@
+---
+- name: copy many files
+  hosts: ansible_vms
+  become: true
+  gather_facts: false
+  tasks:
+  - name: create directory
+    ansible.builtin.file:
+      path: /var/www/html
+      state: directory
+  - name: install rsync
+    package:
+      name: rsync
+      state: latest
+  - name: update web document root
+    ansible.builtin.synchronize:
+      src: ../../volatile/webfiles/
+      dest: /var/www/html/
+
+# touch ../../volatile/webfiles/{one,two,three}

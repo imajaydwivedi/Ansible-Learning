@@ -1,0 +1,34 @@
+---
+- name: install start and enable httpd
+  gather_facts: false
+  hosts: server_ansible
+  tasks:
+  - name: remove nginx package
+    ansible.builtin.package:
+      name: nginx
+      state: absent
+  - name: install package
+    ansible.builtin.package:
+      name: httpd
+      state: latest
+  - name: start and enable service
+    ansible.builtin.service:
+      name: httpd
+      state: started
+      enabled: yes
+  - name: open firewall
+    firewalld:
+      service: http
+      state: enabled
+      permanent: false
+      immediate: true
+  - name: create web url
+    ansible.builtin.set_fact:
+      web_url: "http://{{ ansible_host }}"
+  - name: debug web url
+    ansible.builtin.debug:
+      msg: The web url is -> {{ web_url }}
+  - name: test httpd access
+    ansible.builtin.uri:
+      url: "{{ web_url }}"
+    delegate_to: localhost
