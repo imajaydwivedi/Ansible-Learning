@@ -1,0 +1,7 @@
+---
+- name: testing fileglob
+  hosts: localhost
+  tasks:
+  - name: testing fileglob
+    debug:
+      msg: "{{ lookup('fileglob', '~/.*') }}"

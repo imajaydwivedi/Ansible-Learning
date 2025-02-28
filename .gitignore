@@ -1,39 +1,40 @@
-/Temp-Scripts/*
-/Org-Project*/*
-/Sensitive/*
-/Work/*
-/Work-*/*
-/Sql-Queries-Office/*
-/Sql-Queries-Work/*
-/Sql-Queries-Personal/*
-/Sql-Queries-Private/*
-/Sql-Queries-Volatile/*
-/Volatile/*
-/Private/*
-/Private/Private.ssmssqlproj
-/Sensitive/Sensitive.ssmssqlproj
-/Volatile/Volatile.ssmssqlproj
-/Work/Work.ssmssqlproj
-/SQLMonitor/dist/
-/SQLMonitor/dist/*
-/SQLMonitor/build/
-/SQLMonitor/build/*
-/SQLMonitor/*.spec
+/temp-scripts/*
+/org-project*/*
+/sensitive/*
+/work/*
+/work-*/*
+/work/
+/sql-queries-office/*
+/sql-queries-work/*
+/sql-queries-personal/*
+/sql-queries-private/*
+/sql-queries-volatile/*
+/volatile/*
+/private/*
+/private/private.ssmssqlproj
+/sensitive/sensitive.ssmssqlproj
+/volatile/volatile.ssmssqlproj
+/work/work.ssmssqlproj
+/sqlmonitor/dist/
+/sqlmonitor/dist/*
+/sqlmonitor/build/
+/sqlmonitor/build/*
+/sqlmonitor/*.spec
 /temp-output-*
 /temp-log-*
-*/Logs/*
+*/logs/*
 *.pyc
 *__pycache__*
 __pycache__/
-.DS_Store
+.ds_store
 ansible-navigator.log
 vault-pass
 
-# Ignore Virtual Env Folder
-/SQLMonitorVenv/*
-/Alerting/AlertEngineVenv/*
-/Alerting/Venv/*
-/Venv/*
+# ignore virtual env folder
+/sqlmonitorvenv/*
+/alerting/alertenginevenv/*
+/alerting/venv/*
+/venv/*
 
 
 

@@ -1,0 +1,7 @@
+---
+- name: Demonstrating the motd role
+  hosts: ansible_vms
+  vars:
+    ansible_manager: Saanvi
+  roles:
+    - motd

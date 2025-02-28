@@ -1,5 +1,9 @@
 :<<'USING_CONDITIONALS_COMMENTS'
 
+https://spacelift.io/blog/ansible-loops
+https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html
+
+
 Understanding Loops
 ---------------------------------
 
@@ -312,7 +316,7 @@ Using Blocks
     - name: create a file
       shell:
         cmd: touch /tmp/rescuefile
-----------------
+----------------  
 
 Example -
 

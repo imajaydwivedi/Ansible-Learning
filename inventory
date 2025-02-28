@@ -1,35 +1,30 @@
-ansible_vms:
-  hosts:
-    server_ansible:
-    server_centos:
-    server_rhel:
-    server_ubuntu:
+[ansible_vms]
+server_ansible
+server_centos
+server_desktop
+server_rhel
+server_ubuntu
 
-redhat:
-  hosts:
-    pgprod:
-    server_ansible:
-    server_centos:
-    server_rhel:
-    msi:
+[redhat]
+pgprod
+server_ansible
+server_centos
+server_rhel
 
-debian:
-  hosts:
-    server_ubuntu:
+[debian]
+server_ubuntu
+server_desktop
+msi
 
-laptops:
-  hosts:
-    msi:
+[laptops]
+msi
 
-postgres:
-  hosts:
-    pgprod:
-    msi:
+[postgres]
+pgprod
+msi
 
-desktop:
-  hosts:
-    localhost:
+[desktop]
+localhost
 
-macbook:
-  hosts:
-    officelaptop
+[macbook]
+officelaptop
