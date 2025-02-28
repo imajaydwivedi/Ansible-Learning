@@ -1,0 +1,29 @@
+---
+- name: Retrieve passwd content, and find a specific user
+  hosts: ansible_vms
+  vars_prompt:
+    - name: username
+      prompt: which user are you looking for
+  vars:
+    verbose: false
+  tasks:
+    - name: Retrieve /etc/passwd content, and register result
+      ansible.builtin.shell: cat /etc/passwd
+      register: passwd_content
+    - name: Display stored result if verbose is enabled
+      ansible.builtin.debug:
+        var: passwd_content
+      when: verbose
+    - name: Confirm if user is found in /etc/passwd stored result
+      ansible.builtin.debug:
+        msg: echo "passwd contains user {{ username }}"
+      when: passwd_content.stdout.find(username) != -1
+    - name: Mention if user is not found
+      ansible.builtin.debug:
+        msg: echo "passwd does not contain user {{ username }}"
+      when: passwd_content.stdout.find(username) == -1
+
+# ansible-playbook ansible-core-concepts/using-conditionals/find_user.yml
+# find() is python string function
+  # https://www.w3schools.com/python/python_ref_string.asp
+

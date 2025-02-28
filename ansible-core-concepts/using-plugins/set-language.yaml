@@ -1,0 +1,15 @@
+---
+- name: use templates to provide the right language
+  hosts: ansible_vms
+  vars:
+    language: "{{ lookup('env','LANG') | default('en_US.UTF-8') }}"
+  tasks:
+  - name: Show playbook directory
+    ansible.builtin.debug:
+      msg: "The playbook is located in {{playbook_dir}}/motd.{{language}}.j2"
+  - name: install motd in the right language
+    copy:
+      content: "{{ lookup('template', '{{playbook_dir}}/motd.{{language}}.j2') }}"
+      dest: /etc/motd
+
+# ansible-playbook ansible-core-concepts/using-plugins/set-language.yaml

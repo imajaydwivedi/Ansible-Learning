@@ -1,0 +1,12 @@
+---
+- name: Demo loop 2
+  hosts: localhost
+  vars_files:
+    - loopvars
+  tasks:
+    - name: Loop through List items present in vars_files
+      ansible.builtin.debug:
+        msg: showing {{ item }}
+      loop: "{{ myitems }}"
+
+# ansible-playbook ansible-core-concepts/using-conditionals/loop_demo-2.yml

@@ -1,0 +1,11 @@
+---
+- name: Generate hosts file
+  hosts: ansible_vms
+  tasks:
+    - name: Get host ip, name, family, and copy over to /tmp/hosts
+      ansible.builtin.template:
+        src: hosts_info.j2
+        dest: /tmp/hosts
+
+# ansible-playbook ansible-core-concepts/managing-files/hosts_info.yml
+# ansible ansible_vms -a "cat /tmp/hosts"

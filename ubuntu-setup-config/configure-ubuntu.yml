@@ -1,0 +1,13 @@
+---
+- name: Update OS
+  hosts: server_desktop
+  tasks:
+  - name: Print host name
+    ansible.builtin.debug:
+      var: working on host [{{ ansible_fqdn }}]
+
+  - name: Update OS packages to latest
+    ansible.builtin.package:
+      name: '*'
+      state: latest
+      use: 'apt'

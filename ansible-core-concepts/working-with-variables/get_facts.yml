@@ -1,0 +1,9 @@
+---
+- name: Getting facts
+  hosts: pgprod
+  tasks:
+    - name: Showing facts
+      ansible.builtin.debug:
+        var: ansible_facts
+
+# ansible-playbook ansible-core-concepts/working-with-variables/get_facts.yml

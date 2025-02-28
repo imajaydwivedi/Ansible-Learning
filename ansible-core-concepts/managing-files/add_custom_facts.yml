@@ -1,0 +1,41 @@
+---
+- name: Create custom facts directory
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Set custom_facts_dir
+      ansible.builtin.set_fact:
+        custom_facts_dir: /etc/ansible/facts.d
+        custom_facts_file: /etc/ansible/facts.d/local.fact
+
+    - name: create directory {{ custom_facts_dir }}
+      ansible.builtin.file:
+        path: "{{ custom_facts_dir }}"
+        state: directory
+
+- name: Add a custom fact on server_ansible
+  hosts: server_ansible
+  gather_facts: true
+  tasks:
+    - name: Create custom fact on {{ ansible_hostname }}
+      ansible.builtin.blockinfile:
+        path: "{{ custom_facts_dir }}/local.fact"
+        create: true
+        block: |
+          [localfacts]
+          type: testing
+
+- name: Add a custom fact on pgprod
+  hosts: pgprod
+  gather_facts: true
+  tasks:
+    - name: Create custom fact on {{ ansible_hostname }}
+      ansible.builtin.blockinfile:
+        create: true
+        path: "{{ custom_facts_file }}"
+        block: |
+          [localfacts]
+          type: production
+
+# ansible-playbook ansible-core-concepts/managing-files/add_custom_facts.yml
+
