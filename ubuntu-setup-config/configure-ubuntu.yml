@@ -1,13 +1,28 @@
 ---
 - name: Update OS
   hosts: server_desktop
-  tasks:
+  vars:
+    clear_screen: true
+  pre_tasks:
   - name: Print host name
     ansible.builtin.debug:
       var: working on host [{{ ansible_fqdn }}]
 
   - name: Update OS packages to latest
-    ansible.builtin.package:
-      name: '*'
+    ansible.builtin.apt:
+      update_cache: yes
+      upgrade: yes
+      # name: '*'
+      # state: latest
+
+  - name: Install core required packages
+    ansible.builtin.apt:
+      name:
+        - python3-pip
+        - dbus-x11
+        - dconf-editor
       state: latest
-      use: 'apt'
+
+  roles:
+  - ubuntu-mate-desktop
+

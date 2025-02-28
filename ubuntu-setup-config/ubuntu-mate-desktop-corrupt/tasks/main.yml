@@ -1,0 +1,15 @@
+---
+
+- name: Use fake windows desktop theme
+  ansible.builtin.include_tasks:
+    file: fake_windows.yml
+  when: fake_windows
+
+- name: Use mate theme
+  ansible.builtin.include_tasks:
+    file: mate.yml
+  when: not fake_windows
+
+- name: Set Desktop Background
+  ansible.builtin.include_tasks:
+    file: background.yml

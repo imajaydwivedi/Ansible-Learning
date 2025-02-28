@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Lenhard.Reuter
+  role_name: ubuntu_mate_desktop_customization
+  description: Customizing Ubuntu MATE desktop
+  company: Austrian Institute of Technology (AIT)
+
+  license: GPL-3.0
+  min_ansible_version: 2.1.0
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+
+  galaxy_tags:
+    - ubuntu
+    - mate
+    - desktop
+    - themes
+    - background
+    - panel

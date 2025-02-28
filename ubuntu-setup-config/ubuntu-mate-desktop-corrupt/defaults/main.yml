@@ -1,0 +1,76 @@
+---
+string_indicator: "'"
+desktop_bg_src: files/wallpaper.png
+customize_theme_name: Yaru-Mate
+panel_layout: redmond
+customize_theme_package: gtk-theme-yaru-mate
+customize_theme_repo: ppa:flexiondotorg/yaru-mate
+force_desktop_reset: false
+customize_user: "{{ ansible_user }}"
+
+default_panel_list:
+  - briskmenu
+  - notification-area
+  - indicatorappletcomplete
+  - show-desktop
+  - window-list
+  - workspace-switcher
+  - trashapplet
+  - firefox
+
+default_launcher_object:
+  object-type: launcher
+  toplevel-id: "{{ 'bottom' if fake_windows else 'top' }}"
+  position: 20
+  menu-path: applications:/
+
+mate_autostart_absent_list:
+  - snap-userd-autostart.desktop
+  - mate-power-manager.desktop
+  - mate-screensaver.desktop
+  - nm-applet.desktop
+  - onboard-autostart.desktop
+  - org.gnome.SettingsDaemon.Wacom.desktop
+  - update-notifier.desktop
+  - org.gnome.SettingsDaemon.ScreensaverProxy.desktop
+  - org.gnome.SettingsDaemon.Smartcard.desktop
+  - print-applet.desktop
+  - geoclue-demo-agent.desktop
+
+mate_dconf_settings:
+  /org/mate/desktop/interface/gtk-theme: "'{{ customize_theme_name }}'"
+  /org/mate/desktop/interface/icon-theme: "'{{ customize_theme_name }}'"
+  /org/mate/marco/general/theme: "'{{ customize_theme_name }}'"
+  /desktop/ibus/panel/custom-font: "'Sans 10'"
+  /org/mate/caja/desktop/font: "'Sans 10'"
+  /org/mate/desktop/interface/font-name: "'Sans 10'"
+  /org/mate/mate-menu/applet-text: "'menu'"
+  /org/mate/marco/general/titlebar-font: "'Sans 10'"
+  /org/mate/desktop/interface/document-font-name: "'Sans 10'"
+  /com/canonical/indicator/datetime/show-date: "true"
+  /com/canonical/indicator/datetime/show-seconds: "true"
+
+launcher_objects: {}
+content:
+
+fake_windows: false
+fake_windows_theme_name: "Windows 10"
+fake_windows_theme_repo: https://github.com/B00merang-Project/Windows-10/archive/refs/heads/master.zip
+fake_windows_icons_name: "Windows 10"
+fake_windows_icons_repo: https://github.com/B00merang-Artwork/Windows-10/archive/refs/heads/master.zip
+
+fake_windows_dconf_settings:
+  /org/mate/desktop/interface/gtk-theme: "'Windows 10'"
+  /org/mate/desktop/interface/icon-theme: "'Windows 10'"
+  /org/mate/marco/general/theme: "'Windows 10'"
+  /desktop/ibus/panel/custom-font: "'Sans 10'"
+  /org/mate/caja/desktop/font: "'Sans 10'"
+  /org/mate/desktop/interface/font-name: "'Sans 10'"
+  /org/mate/panel/toplevels/bottom/size: 30
+  /org/mate/mate-menu/applet-text: "' '"
+  /org/mate/marco/general/titlebar-font: "'Sans 10'"
+  /org/mate/desktop/interface/document-font-name: "'Sans 10'"
+  /com/canonical/indicator/datetime/show-date: "true"
+  /com/canonical/indicator/datetime/show-seconds: "true"
+
+fake_windows_default_panel_list: []

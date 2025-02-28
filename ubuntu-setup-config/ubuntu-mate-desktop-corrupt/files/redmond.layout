@@ -1,0 +1,34 @@
+[Toplevel bottom]
+expand=true
+orientation=bottom
+size=30
+
+[Object mate-menu]
+locked=true
+position=0
+toplevel-id=bottom
+applet-iid=MateMenuAppletFactory::MateMenuApplet
+object-type=applet
+
+[Object window-list]
+object-type=applet
+applet-iid=WnckletFactory::WindowListApplet
+toplevel-id=bottom
+position=40
+locked=true
+
+[Object notification-area]
+object-type=applet
+applet-iid=NotificationAreaAppletFactory::NotificationArea
+toplevel-id=bottom
+position=10
+panel-right-stick=true
+locked=true
+
+[Object indicatorappletcomplete]
+object-type=applet
+applet-iid=IndicatorAppletCompleteFactory::IndicatorAppletComplete
+toplevel-id=bottom
+position=0
+panel-right-stick=true
+locked=true

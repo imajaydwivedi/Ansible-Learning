@@ -1,0 +1,103 @@
+---
+
+- name: Replace redmond.layout
+  become: true
+  ansible.builtin.copy:
+    src: "redmond.layout"
+    dest: /usr/share/mate-panel/layouts/redmond.layout
+    mode: "0644"
+    owner: root
+
+- name: Reset dconf to default
+  # become_user: "{{ customize_user }}"
+  become: true
+  ansible.builtin.shell:
+    cmd: dbus-launch dconf reset -f /
+  when: fake_windows
+
+- name: Reboot machine and wait
+  ansible.builtin.reboot:
+
+- name: Set Redmond as default layout
+  # become_user: "{{ customize_user }}"
+  become: true
+  community.general.dconf:
+    key: /org/mate/panel/general/default-layout
+    value: "'redmond'"
+
+- name: Set Redmond as current layout
+  # become_user: "{{ customize_user }}"
+  become: true
+  ansible.builtin.shell:
+    cmd: dbus-launch mate-panel --layout redmond &
+  when: fake_windows
+
+- name: Get Windows theme
+  become: true
+  ansible.builtin.unarchive:
+    src: "{{ fake_windows_theme_repo }}"
+    dest: "/usr/share/themes"
+    owner: "root"
+    mode: 0755
+    remote_src: true
+
+- name: Rename themes folder
+  ansible.builtin.copy:
+    src: /usr/share/themes/Windows-10-master/
+    dest: "/usr/share/themes/{{ fake_windows_theme_name }}"
+    remote_src: true
+    mode: preserve
+
+- name: Delete old folder
+  ansible.builtin.file:
+    path: /usr/share/themes/Windows-10-master/
+    state: absent
+
+- name: Get Windows icons theme
+  become: true
+  ansible.builtin.unarchive:
+    src: "{{ fake_windows_icons_repo }}"
+    dest: "/usr/share/icons"
+    owner: "root"
+    mode: 0755
+    remote_src: true
+
+- name: Rename icons folder
+  ansible.builtin.copy:
+    src: /usr/share/icons/Windows-10-master/
+    dest: "/usr/share/icons/{{ fake_windows_icons_name }}"
+    remote_src: true
+    mode: preserve
+
+- name: Delete old folder
+  ansible.builtin.file:
+    path: /usr/share/icons/Windows-10-master/
+    state: absent
+
+- name: Adjust dconf settings
+  # become_user: "{{ customize_user }}"
+  become: true
+  community.general.dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ fake_windows_dconf_settings | dict2items }}"
+
+- name: Create and define launcher objects
+  ansible.builtin.include_tasks:
+    file: create_new_panel_objects.yml
+    apply:
+      vars:
+        object_name: "{{ new_items.key }}"
+        object_properties: "{{ new_items.value }}"
+        new_panel_list: "{{ fake_windows_default_panel_list }}"
+  loop: "{{ launcher_objects | dict2items }}"
+  loop_control:
+    loop_var: new_items
+
+- name: Set new panel list
+  # become_user: "{{ customize_user }}"
+  become: true
+  community.general.dconf:
+    key: /org/mate/panel/general/object-id-list
+    value: "{{ new_panel_list }}"
+  when: new_panel_list is defined

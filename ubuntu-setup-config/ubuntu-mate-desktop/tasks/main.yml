@@ -1,0 +1,12 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ubuntu-mate-desktop
+- name: Install psutil python package
+  ansible.builtin.shell:
+    cmd: pip3 install psutil --break-system-packages
+
+- name: Install ubuntu-mate-desktop package
+  ansible.builtin.apt:
+    name: ubuntu-mate-desktop
+    state: latest
+
