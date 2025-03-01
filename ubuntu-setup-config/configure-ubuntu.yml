@@ -12,8 +12,6 @@
     ansible.builtin.apt:
       update_cache: yes
       upgrade: yes
-      # name: '*'
-      # state: latest
 
   - name: Update All existing OS packages
     ansible.builtin.apt:
@@ -44,6 +42,13 @@
       test_command: uptime
     when: reboot_required_file.stat.exists
 
+  - name: Install [ubuntu-mate-desktop] package
+  ansible.builtin.apt:
+    name: ubuntu-mate-desktop
+    state: latest
+  tags: [install, config]
+
   roles:
+  # Configure mate-desktop
   - ubuntu-mate-desktop
 

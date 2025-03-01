@@ -5,12 +5,6 @@
     cmd: pip3 install psutil --break-system-packages
   tags: [install, config]
 
-- name: Install [ubuntu-mate-desktop] package
-  ansible.builtin.apt:
-    name: ubuntu-mate-desktop
-    state: latest
-  tags: [install, config]
-
 - name: Copy [dconf-org_mate.ini] to {{ ansible_host}}
   become_user: "{{ customize_user }}"
   become: true
