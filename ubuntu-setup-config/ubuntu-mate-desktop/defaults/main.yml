@@ -1,3 +1,5 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # defaults file for ubuntu-mate-desktop
+panel_layout: redmond
+customize_user: saanvi

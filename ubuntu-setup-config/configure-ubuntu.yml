@@ -6,22 +6,43 @@
   pre_tasks:
   - name: Print host name
     ansible.builtin.debug:
-      var: working on host [{{ ansible_fqdn }}]
+      msg: working on host [{{ ansible_fqdn }}]
 
-  - name: Update OS packages to latest
+  - name: Update OS cache
     ansible.builtin.apt:
       update_cache: yes
       upgrade: yes
       # name: '*'
       # state: latest
 
+  - name: Update All existing OS packages
+    ansible.builtin.apt:
+      name: '*'
+      state: latest
+
   - name: Install core required packages
     ansible.builtin.apt:
       name:
         - python3-pip
         - dbus-x11
+        - dbus
+        - tldr
         - dconf-editor
       state: latest
+
+  - name: Check if a reboot is needed for Debian and Ubuntu boxes
+    register: reboot_required_file
+    stat: path=/var/run/reboot-required
+
+  - name: Reboot the Debian or Ubuntu server
+    reboot:
+      msg: "Reboot initiated by Ansible due to kernel updates"
+      connect_timeout: 5
+      reboot_timeout: 300
+      pre_reboot_delay: 0
+      post_reboot_delay: 30
+      test_command: uptime
+    when: reboot_required_file.stat.exists
 
   roles:
   - ubuntu-mate-desktop
