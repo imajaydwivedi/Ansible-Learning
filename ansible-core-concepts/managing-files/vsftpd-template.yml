@@ -1,0 +1,20 @@
+---
+- name: configure VSFTPD using a template
+  hosts: server_ansible
+  vars:
+    anonymous_enable: yes
+    local_enable: yes
+    write_enable: yes
+    anon_upload_enable: yes
+  tasks:
+  - name: install VSFTPD
+    ansible.builtin.package:
+      name: vsftpd
+      state: latest
+  - name: use template to copy FTP config
+    ansible.builtin.template:
+      src: vsftpd.j2
+      dest: /etc/vsftpd/vsftpd.conf
+
+# ansible-playbook ansible-core-concepts/managing-files/vsftpd-template.yml
+

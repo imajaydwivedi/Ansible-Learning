@@ -1,0 +1,30 @@
+---
+- name: Using blocks
+  hosts: server_ansible
+  tasks:
+  - name: intended to be successful
+    block:
+    - name: remove a file
+      ansible.builtin.shell:
+        cmd: rm /var/www/html/index.html
+    - name: printing status
+      ansible.builtin.debug:
+        msg: block task was operated
+    rescue:
+    - name: create a file
+      ansible.builtin.shell:
+        cmd: touch /var/www/html/index.html
+    - name: printing rescue status
+      ansible.builtin.debug:
+        msg: result task was operated
+    always:
+    - name: always write a message to logs
+      shell:
+        cmd: logger hello
+    - name: always printing this message
+      ansible.builtin.debug:
+        msg: this message is always printed
+
+# ansible-playbook ansible-core-concepts/using-conditionals/blocks-2.yml
+
+

@@ -1,0 +1,19 @@
+---
+- name: Using multiple conditions
+  hosts: ansible_vms
+  vars:
+    debug: true
+  tasks:
+    - name: Print fact values
+      ansible.builtin.debug:
+        msg: ansible_distribution is {{ ansible_distribution }} wheres ansible_memfree_mb is {{ ansible_memfree_mb }}
+
+    - name: Install httpd when CentOS & MemFree > 512 mb
+      ansible.builtin.package:
+        name: httpd
+        state: installed
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_memfree_mb > 512
+
+# ansible-playbook ansible-core-concepts/using-conditionals/when_multiple.yml

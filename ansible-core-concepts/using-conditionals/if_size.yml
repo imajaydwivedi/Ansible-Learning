@@ -1,0 +1,21 @@
+---
+- name: Conditionals Test
+  hosts: ansible_vms
+  vars:
+    package: nmap
+  tasks:
+    - name: Print used facts
+      ansible.builtin.debug:
+        msg: item.mount is '{{ item.mount }}' || item.size_available is '{{ item.size_available }}'
+      loop: "{{ ansible_mounts }}"
+      when: item.mount == "/boot"
+
+    - name: Install vsftpd if sufficient space on /boot
+      ansible.builtin.package:
+        name: "{{ package }}"
+        state: latest
+      loop: "{{ ansible_mounts }}"
+      when: item.mount == "/boot" and item.size_available > 100000000
+
+# ansible-playbook ansible-core-concepts/using-conditionals/if_size.yml 
+

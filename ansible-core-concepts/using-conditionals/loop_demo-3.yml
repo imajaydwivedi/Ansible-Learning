@@ -1,0 +1,12 @@
+---
+- name: Demo loop 3
+  hosts: localhost
+  vars_files:
+    - usernames
+  tasks:
+    - name: Loop through Dictionary items present in vars_files
+      ansible.builtin.debug:
+        msg: add {{ item.uname }} user to {{ item.ugroups }} group
+      loop: "{{ myusers }}"
+
+# ansible-playbook ansible-core-concepts/using-conditionals/loop_demo-3.yml

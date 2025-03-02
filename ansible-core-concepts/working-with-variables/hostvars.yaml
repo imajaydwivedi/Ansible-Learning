@@ -1,0 +1,20 @@
+---
+- name: Showing host variables
+  hosts: server_ansible
+  vars:
+    myuser: anant
+    groups: fun_lovers
+  tasks:
+    - name: Print message
+      ansible.builtin.debug:
+        msg: this host with name {{ inventory_hostname }} is using {{ hostvars }}
+    - name: Creating group
+      ansible.builtin.command: groupadd "{{ groups }}"
+    - name: Creating user that is member of {{ groups }}
+      ansible.builtin.user:
+        name: "{{ myuser }}"
+        groups: "{{ groups }}"
+
+# ansible-doc user
+# ansible-navigator run ansible-core-concepts/working-with-variables/hostvars.yaml
+# ansible-playbook ansible-core-concepts/working-with-variables/hostvars.yaml
