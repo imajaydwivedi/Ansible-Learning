@@ -21,8 +21,6 @@ ssh-copy-id ansible@server_desktop
 # enable password sudo for ansible user
 ansible server_desktop -m copy -a"src=/etc/sudoers.d/ansible dest=/etc/sudoers.d/ansible" -K
 
-# copy a file to remote machine
-ansible server_desktop -m copy -a"src=ubuntu-mate-desktop/files/dconf-mate-panel dest=/tmp/dconf-mate-panel"
 ```
 
 ## Update `ubuntu-setup-config/files/etc_hosts` file

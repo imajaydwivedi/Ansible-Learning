@@ -40,16 +40,17 @@ softwares:
   - xrdp
   - ubuntu-restricted-extras
 
-# snap_packages:
-#   - chatgpt-desktop
+snap_packages:
+  - chatgpt-desktop
+  - gcompris
+  - extreme-tux-racer
+  - tuxfight
 
 games:
   - supertux
   - supertuxkart
   - gnome-mines
   - gnome-sudoku
-  - extreme-tuxracer
-  - tuxfight
 
 learnings:
   - tuxmath
@@ -57,7 +58,7 @@ learnings:
   - tuxtype
   - scratch
   # - scratchjr # Instructions for scratchjr are present in README.md
-  - gcompris
+  #- gcompris
   - gcompris-qt
   - gimp
   - klettres
@@ -84,7 +85,6 @@ non_packaged_softwares:
     friendly_name: Google Chrome
     url: "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
 
-  - name: chatgpt-desktop
 
 
 

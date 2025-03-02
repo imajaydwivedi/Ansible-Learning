@@ -1,6 +1,6 @@
 ---
 - name: Update OS
-  hosts: server_desktop
+  hosts: all
   vars:
     clear_screen: true
   vars_files:
@@ -14,10 +14,16 @@
   roles:
 
     - packages
-    - darkwizard242.googlechrome
-    - darkwizard242.bravebrowser
+    # - darkwizard242.googlechrome
+    # - darkwizard242.bravebrowser
     # - guake
     # - ubuntu-mate-desktop
+    # - cockpit
+    # - kvm
+    # - mssql
+    # - postgresql
+    # - podman
+    # - nginx
 
   post_tasks:
   - name: Add host entries
