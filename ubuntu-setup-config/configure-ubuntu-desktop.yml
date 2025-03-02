@@ -1,0 +1,38 @@
+---
+- name: Update OS
+  hosts: server_desktop
+  vars:
+    clear_screen: true
+  vars_files:
+    - vars/desktop_vars.yml
+
+  pre_tasks:
+  - name: Print host name
+    ansible.builtin.debug:
+      msg: "Running playook -> {{ playbook_dir }}/configure-ubuntu-desktop.yml"
+
+  roles:
+
+    - packages
+    - darkwizard242.googlechrome
+    - darkwizard242.bravebrowser
+    # - guake
+    # - ubuntu-mate-desktop
+
+  post_tasks:
+  - name: Add host entries
+    ansible.builtin.import_tasks: tasks/config-etc-hosts.yml
+
+  # - name: Create soft links in home directory
+  #   ansible.builtin.import_tasks: tasks/create-software-links.yml
+
+  # - name: Add startup applications
+  #   ansible.builtin.import_tasks: tasks/add-startup-apps.yml
+
+  # - name: Add Microsoft cascadia font
+  #   ansible.builtin.import_tasks: tasks/add-cascadia-code-fonts.yml
+
+  # - name: Configure global git settings
+  #   ansible.builtin.import_tasks: tasks/config-git-global-user.yml
+
+

@@ -1,0 +1,19 @@
+---
+- name: Access non apt packages
+  ansible.builtin.debug:
+    msg: "Accessing non apt packages"
+  loop: "{{ non_packaged_softwares }}"
+  loop_control:
+    loop_var: deb_software
+
+- name: Download non apt packages
+  ansible.builtin.get_url:
+    url: "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+    dest: "/tmp/code.deb"
+    mode: "0644"
+  loop: "{{ non_packaged_softwares }}"
+
+- name: Install non apt packages
+  ansible.builtin.apt:
+    deb: "/tmp/code.deb"
+  loop: "{{ non_packaged_softwares }}"
