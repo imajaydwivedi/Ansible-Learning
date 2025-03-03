@@ -1,0 +1,12 @@
+---
+- name: Understanding the lineinfile module backrefs attribute
+  hosts: localhost
+  vars:
+    logging_param: DEBUG
+  tasks:
+  - name: Change log level to DEBUG using backrefs
+    ansible.builtin.lineinfile:
+      path: "{{playbook_dir}}/example.conf"
+      regexp: '^(log_level\s*=\s*)\w+'     # Capture "log_level = " and the existing value
+      line: '\1{{ logging_param }}'        # Replace only the value with "DEBUG", keeping "log_level = "
+      backrefs: yes                        # Enables backreferences
