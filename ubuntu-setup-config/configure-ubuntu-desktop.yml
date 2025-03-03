@@ -14,8 +14,6 @@
   roles:
 
     - packages
-    # - darkwizard242.googlechrome
-    # - darkwizard242.bravebrowser
     # - guake
     # - ubuntu-mate-desktop
     # - cockpit
