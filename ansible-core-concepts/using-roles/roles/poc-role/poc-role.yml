@@ -3,6 +3,7 @@
   hosts: localhost
   vars:
     ansible_manager: Saanvi
+    playbook_base_dir_name: "{{ playbook_dir | basename }}"
 
   pre_tasks:
     - name: Get playbook base directory name
@@ -12,5 +13,10 @@
       ansible.builtin.debug:
         msg: "The playbook base directory is: {{ playbook_base_dir_name }}"
 
-  roles:
-    - poc-role
+  # roles:
+  #   - poc-role
+
+  tasks:
+    - name: Execute role {{playbook_base_dir_name}}
+      ansible.builtin.include_role:
+        name: "../{{ playbook_base_dir_name }}"
