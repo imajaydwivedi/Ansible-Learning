@@ -1,0 +1,7 @@
+---
+- name: Demonstrating the POC role
+  hosts: localhost
+  vars:
+    ansible_manager: Saanvi
+  roles:
+    - poc-role

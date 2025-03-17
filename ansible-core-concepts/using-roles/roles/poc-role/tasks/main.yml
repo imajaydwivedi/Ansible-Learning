@@ -1,0 +1,30 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for poc-role
+- name: Debug variables
+  ansible.builtin.debug:
+    var: other_datacenter_nodes
+
+- name: Running poc-role
+  ansible.builtin.template:
+    src: poc-role.j2
+    dest: /tmp/etc_hosts
+
+# - name: Read /tmp/etc_hosts file content
+#   ansible.builtin.slurp:
+#     src: /tmp/etc_hosts
+#   register: file_content_raw
+
+# - name: Show /tmp/etc_hosts file content
+#   ansible.builtin.debug:
+#     msg: "{{ item }}"
+#   loop: "{{ lookup('file', '/tmp/etc_hosts').splitlines() }}"
+
+- name: Show /tmp/etc_hosts file content
+  ansible.builtin.debug:
+    msg: "{{ lookup('file', '/tmp/etc_hosts').splitlines() }}"
+
+# - name: Show /tmp/etc_hosts file content
+#   debug: msg="{{item}}"
+#   with_lines: cat /tmp/etc_hosts
+
