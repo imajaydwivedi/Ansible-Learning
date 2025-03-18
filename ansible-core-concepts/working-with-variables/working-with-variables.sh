@@ -350,6 +350,132 @@ chmod 600 vault-pass
 ansible-playbook --vault-password-file=ansible-core-concepts/working-with-variables/vault-pass \
     ansible-core-concepts/working-with-variables/create-user.yml
 
+
+
 WORKING_WITH_VARIABLES
+
+
+
+
+:<<'MAGIC_VARIABLES'
+
+Role-Specific Auto/Magic Variables
+==============================================
+
++----------------+---------------------------------------------+
+| Variable       | Description                                 |
++----------------+---------------------------------------------+
+| role_name      | Name of the current role                    |
+| role_path      | Absolute path to the role directory         |
+| role_vars      | Variables defined in role's vars directory  |
+| role_defaults  | Variables defined in role's defaults dir    |
++----------------+---------------------------------------------+
+
+Playbook-Related Auto/Magic Variables
+==============================================
+
++------------------------+-------------------------------------------------------------+
+| Variable               | Description                                                 |
++------------------------+-------------------------------------------------------------+
+| playbook_dir           | Directory of the executing playbook (absolute path)         |
+| inventory_dir          | Directory of the inventory source                           |
+| inventory_file         | Path of the inventory file being used                       |
+| group_names            | List of groups the current host is in                      |
+| groups                 | Dictionary of groups and their hosts from inventory         |
+| inventory_hostname     | Current host's name in the inventory                        |
+| ansible_play_hosts     | List of all hosts in the current play                      |
+| ansible_play_batch     | Hosts in the current play that haven't failed               |
+| ansible_playbook_python| Python interpreter path running the playbook                |
++------------------------+-------------------------------------------------------------+
+
+
+Host-Related Auto/Magic Variables
+===========================================
+
++------------------------------+-----------------------------------------------------+
+| Variable                     | Description                                         |
++------------------------------+-----------------------------------------------------+
+| ansible_hostname             | Short hostname of the target machine               |
+| ansible_facts                | Facts gathered from the host                       |
+| ansible_distribution         | OS distribution of the host                        |
+| inventory_hostname_short     | Shortened version of inventory_hostname            |
+| hostvars                     | Dictionary of variables for all hosts              |
+| ansible_all_ipv4_addresses   | List of all IPv4 addresses of the host             |
++------------------------------+-----------------------------------------------------+
+
+
+Task-Related Magic Variables
+=============================================
+
++----------------------------+-------------------------------------------------------+
+| Variable                   | Description                                           |
++----------------------------+-------------------------------------------------------+
+| ansible_check_mode         | true if playbook is running in check mode            |
+| ansible_delegated_vars     | Information about a delegated host                   |
+| ansible_failed_result      | Result of last failed task (rescue/always use cases)  |
+| ansible_loop               | Info about the current loop iteration                |
+| ansible_skip_tags          | Tags skipped in the current play                     |
++----------------------------+-------------------------------------------------------+
+
+
+Block and Include-Related Magic Variables
+===================================================
+
++------------------------------+-----------------------------------------------------+
+| Variable                     | Description                                         |
++------------------------------+-----------------------------------------------------+
+| block                        | Block task structure when using block keyword       |
+| include_role                 | Info about an included role                        |
+| include_tasks                | Info about an included task file                   |
+| ansible_parent_role_names    | List of parent roles in the inclusion chain         |
++------------------------------+-----------------------------------------------------+
+
+
+Connection and Execution Info Variables
+===================================================
+
++-------------------------------------+---------------------------------------------+
+| Variable                            | Description                                 |
++-------------------------------------+---------------------------------------------+
+| ansible_connection                  | Connection type (ssh, local, winrm, etc.)   |
+| ansible_user                        | User account used for the connection        |
+| ansible_host                        | Hostname/IP address for the connection      |
+| ansible_port                        | Port used for the connection                |
+| ansible_ssh_private_key_file        | SSH key used for the connection             |
++-------------------------------------+---------------------------------------------+
+
+
+Common Path Variables Quick Reference
+===================================================
+
++----------------+--------------------------------------+
+| Variable       | Path Description                     |
++----------------+--------------------------------------+
+| playbook_dir   | Playbook file's directory            |
+| role_path      | Current role’s directory             |
+| inventory_dir  | Directory of the inventory source    |
+| inventory_file | Path of the inventory file           |
++----------------+--------------------------------------+
+
+
+Example Usage in Tasks
+=======================
+
+- name: Show role path
+  debug:
+    msg: "Current role path is {{ role_path }}"
+
+- name: Show playbook directory
+  debug:
+    msg: "Playbook is running from {{ playbook_dir }}"
+
+- name: Show inventory file
+  debug:
+    msg: "Inventory file used is {{ inventory_file }}"
+
+
+
+
+MAGIC_VARIABLES
 
 
