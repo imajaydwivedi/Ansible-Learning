@@ -1,0 +1,16 @@
+---
+- name: Demonstrating the POC role
+  hosts: localhost
+  vars:
+    ansible_manager: Saanvi
+
+  pre_tasks:
+    - name: Get playbook base directory name
+      ansible.builtin.set_fact:
+        playbook_base_dir_name: "{{ playbook_dir | basename }}"
+    - name: Show the base directory name
+      ansible.builtin.debug:
+        msg: "The playbook base directory is: {{ playbook_base_dir_name }}"
+
+  roles:
+    - poc-role
