@@ -41,7 +41,7 @@ jobs:
 
           rm -f $ROLE_FOLDER/defaults/creds.yml
           touch $ROLE_FOLDER/defaults/creds.yml
-          echo creds: >> ${{ env.environment }}/defaults/creds.yml
+          echo creds: >> $ROLE_FOLDER/defaults/creds.yml
           echo \ \ PG_SUPERUSER_PWD: $PG_SUPERUSER_PWD >> $ROLE_FOLDER/defaults/creds.yml
           echo \ \ PG_APPUSER: $PG_APPUSER >> $ROLE_FOLDER/defaults/creds.yml
           echo \ \ PG_APPUSER_PWD: $PG_APPUSER_PWD >> $ROLE_FOLDER/defaults/creds.yml
