@@ -25,6 +25,10 @@
     path: /tmp/etc_hosts
   register: myfile_status
 
+- name: Print myfile_status variable
+  ansible.builtin.debug:
+    var: myfile_status
+
 # - name: Read /tmp/etc_hosts file content
 #   ansible.builtin.slurp:
 #     src: /tmp/etc_hosts
