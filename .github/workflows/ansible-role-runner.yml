@@ -6,11 +6,12 @@ on:
       role_folder:
         description: 'Role folder to run'
         required: true
-        default: '<role_folder>'
+        # default: '<role_folder>'
+        default: 'github-action-poc-project'
       clean:
         description: 'Cleanup temp files generated for playbook at end? (y/n)'
         required: true
-        default: 'y'
+        default: 'n'
 
 jobs:
   run-ansible-role:
