@@ -20,8 +20,8 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
-      - name: Show selected role folder
-        run: echo Running role from folder: ${{ env.ROLE_FOLDER }}
+      # - name: Show selected role folder
+      #   run: echo Running role from folder: ${{ env.ROLE_FOLDER }}
 
       # - name: Set up Ansible
       #   run: |
