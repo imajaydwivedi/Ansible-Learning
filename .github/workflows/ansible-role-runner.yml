@@ -27,6 +27,16 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
+      # - name: Setup SSH private key
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "${{ secrets.ANSIBLE_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+      #     chmod 600 ~/.ssh/id_rsa
+
+      #     # Optional: Strict host key checking off (or use known_hosts)
+      #     echo "Host *" > ~/.ssh/config
+      #     echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+
       - name: Copy site.yml & hosts.yml to working directory
         run: |
           ROLE_FOLDER="${{ env.ROLE_FOLDER }}"
@@ -63,6 +73,12 @@ jobs:
           rm -f site.yml hosts.yml
           rm -f ${{ env.ROLE_FOLDER }}/defaults/creds.yml
           echo "Cleanup complete!"
+
+      # - name: Clean up SSH key
+      #   if: always()  # ensures it runs even if previous steps fail
+      #   run: |
+      #     shred -u ~/.ssh/id_rsa
+      #     rm -rf ~/.ssh/config
 
       - name: Status of action action
         run: echo "${{ steps.custom.outputs.ansible-status }}"
