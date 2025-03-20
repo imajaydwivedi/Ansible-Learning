@@ -7,6 +7,10 @@ on:
         description: 'Role folder to run'
         required: true
         default: '<role_folder>'
+      clean:
+        description: 'Cleanup temp files generated for playbook at end? (y/n)'
+        required: true
+        default: 'y'
 
 jobs:
   run-ansible-role:
@@ -14,7 +18,9 @@ jobs:
     env:
       ROLE_FOLDER: ${{ github.event.inputs.role_folder }}
       PG_SUPERUSER_PWD: ${{ secrets.PG_SUPERUSER_PWD }}
+      PG_APPUSER: ${{ secrets.PG_APPUSER }}
       PG_APPUSER_PWD: ${{ secrets.PG_APPUSER_PWD }}
+      CLEANUP: ${{ github.event.inputs.clean }}
 
     steps:
       - name: Checkout the repository
@@ -35,7 +41,9 @@ jobs:
 
           rm -f $ROLE_FOLDER/defaults/creds.yml
           touch $ROLE_FOLDER/defaults/creds.yml
+          echo creds: >> ${{ env.environment }}/defaults/creds.yml
           echo \ \ PG_SUPERUSER_PWD: $PG_SUPERUSER_PWD >> $ROLE_FOLDER/defaults/creds.yml
+          echo \ \ PG_APPUSER: $PG_APPUSER >> $ROLE_FOLDER/defaults/creds.yml
           echo \ \ PG_APPUSER_PWD: $PG_APPUSER_PWD >> $ROLE_FOLDER/defaults/creds.yml
 
           cat $ROLE_FOLDER/defaults/creds.yml
@@ -47,13 +55,13 @@ jobs:
           # Run the playbook
           ansible-playbook -i hosts.yml site.yml --extra-vars "role_name=${ROLE_FOLDER}"
 
-      # - name: Cleanup
-      #   run: |
-      #     rm -f site.yml hosts.yml
-
-      - name: remove defaults/creds.yml file
+      - name: Conditional Cleanup
+        if: ${{ env.CLEANUP == 'y' }}
         run: |
+          echo "Cleaning up runtime files..."
+          rm -f site.yml hosts.yml
           rm -f ${{ env.ROLE_FOLDER }}/defaults/creds.yml
+          echo "Cleanup complete!"
 
       - name: Status of action action
         run: echo "${{ steps.custom.outputs.ansible-status }}"

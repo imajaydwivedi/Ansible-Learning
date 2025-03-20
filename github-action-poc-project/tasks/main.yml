@@ -8,7 +8,7 @@
 - name: Use the default/creds.yml file variables for testing
   ansible.builtin.debug:
     #var: creds
-    msg: "username: {{ creds.PG_DB_USER }} || password: {{ creds.PG_DB_USER_PWD }}"
+    msg: "username: {{ creds.PG_APPUSER }} || password: {{ creds.PG_APPUSER_PWD }}"
 
 - name: Debug variables
   ansible.builtin.debug:
