@@ -1,9 +1,6 @@
 name: Ansible Playbook Runner
 
 on:
-  # push:
-  #   branches:
-  #     - main
   workflow_dispatch:
     inputs:
       environment:
@@ -29,25 +26,25 @@ jobs:
       with:
         path: '.github/actions/ansible'
 
-    - name: Create defaults/creds.yml file
-      env:
-        PG_SUPERUSER_PWD: ${{ secrets.PG_SUPERUSER_PWD }}
-        PG_APPUSER_PWD: ${{ secrets.PG_APPUSER_PWD }}
-      run: |
-        rm -f ${{ env.environment }}/defaults/creds.yml
-        touch ${{ env.environment }}/defaults/creds.yml
-        echo \ \ PG_SUPERUSER_PWD: $PG_SUPERUSER_PWD >> ${{ env.environment }}/defaults/creds.yml
-        echo \ \ PG_APPUSER_PWD: $PG_APPUSER_PWD >> ${{ env.environment }}/defaults/creds.yml
-        cat ${{ env.environment }}/defaults/creds.yml
+    # - name: Create defaults/creds.yml file
+    #   env:
+    #     PG_SUPERUSER_PWD: ${{ secrets.PG_SUPERUSER_PWD }}
+    #     PG_APPUSER_PWD: ${{ secrets.PG_APPUSER_PWD }}
+    #   run: |
+    #     rm -f ${{ env.environment }}/defaults/creds.yml
+    #     touch ${{ env.environment }}/defaults/creds.yml
+    #     echo \ \ PG_SUPERUSER_PWD: $PG_SUPERUSER_PWD >> ${{ env.environment }}/defaults/creds.yml
+    #     echo \ \ PG_APPUSER_PWD: $PG_APPUSER_PWD >> ${{ env.environment }}/defaults/creds.yml
+    #     cat ${{ env.environment }}/defaults/creds.yml
 
     # - name: Show Ansible Version
     #   run: ansible --version
 
-    - name: Copy hosts file
-      run: "cp ./${{ env.environment }}/hosts.yml ./hosts.yml"
+    # - name: Copy hosts file
+    #   run: "cp ./${{ env.environment }}/hosts.yml ./hosts.yml"
 
-    - name: Copy site yml
-      run: "cp ./${{ env.environment }}/site.yml ./site.yml"
+    # - name: Copy site yml
+    #   run: "cp ./${{ env.environment }}/site.yml ./site.yml"
 
     # - name: Deploy postgres
     #   id: custom
@@ -60,9 +57,9 @@ jobs:
       run: |
         ansible-playbook using-roles/roles/poc-role/poc-role.yml -i localhost, -c local
 
-    - name: remove defaults/creds.yml file
-      run: |
-        rm -f ${{ env.environment }}/defaults/creds.yml
+    # - name: remove defaults/creds.yml file
+    #   run: |
+    #     rm -f ${{ env.environment }}/defaults/creds.yml
 
     - name: Status of action action
       run: echo "${{ steps.custom.outputs.ansible-status }}"

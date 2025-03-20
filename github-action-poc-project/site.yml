@@ -1,16 +1,9 @@
-- name: Run Ansible Role
+- name: Run the {{ role_name }} role
   hosts: all
-  remote_user: ansible
   gather_facts: true
   any_errors_fatal: true
   become: true
 
-  # pre_tasks:
-  #   - name: Get env variable name
-  #     ansible.builtin.debug:
-  #       vars: ${{ env.environment }}
-
   roles:
-    - role: github-action-poc-project
-      # vars:
-      #   minimal_ansible_version: 2.11.0
+    - "{{ role_name }}"
+    # - role: github-action-poc-project

@@ -1,0 +1,48 @@
+name: Ansible Role Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      role_folder:
+        description: 'Role folder to run (e.g., github-action-poc-project or ubuntu-setup-config)'
+        required: true
+        default: '<role_folder>'
+
+jobs:
+  run-ansible-role:
+    runs-on: ubuntu
+    env:
+      ROLE_FOLDER: ${{ github.event.inputs.role_folder }}
+      PG_SUPERUSER_PWD: ${{ secrets.PG_SUPERUSER_PWD }}
+      PG_APPUSER_PWD: ${{ secrets.PG_APPUSER_PWD }}
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Show selected role folder
+        run: echo "Running role from folder: ${{ env.ROLE_FOLDER }}"
+
+      # - name: Set up Ansible
+      #   run: |
+      #     sudo apt update
+      #     sudo apt install -y ansible
+      #     ansible --version
+
+      - name: Prepare playbook and inventory
+        run: |
+          ROLE_FOLDER="${{ env.ROLE_FOLDER }}"
+
+          echo "Copying site.yml and hosts.yml from $ROLE_FOLDER"
+
+          cp "$ROLE_FOLDER/site.yml" ./site.yml
+          cp "$ROLE_FOLDER/hosts.yml" ./hosts.yml
+
+          echo "Running playbook site.yml with inventory hosts.yml"
+
+          # Run the playbook
+          ansible-playbook -i hosts.yml site.yml --extra-vars "role_name=${ROLE_FOLDER}"
+
+      - name: Cleanup (Optional)
+        run: |
+          rm -f site.yml hosts.yml
