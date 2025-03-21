@@ -37,14 +37,14 @@ jobs:
       #     echo "Host *" > ~/.ssh/config
       #     echo "  StrictHostKeyChecking no" >> ~/.ssh/config
 
-      - name: Copy site.yml & hosts.yml to working directory
-        run: |
-          ROLE_FOLDER="${{ env.ROLE_FOLDER }}"
+      # - name: Copy site.yml & hosts.yml to working directory
+      #   run: |
+      #     ROLE_FOLDER="${{ env.ROLE_FOLDER }}"
 
-          echo "Copying site.yml and hosts.yml from $ROLE_FOLDER"
+      #     echo "Copying site.yml and hosts.yml from $ROLE_FOLDER"
 
-          cp "$ROLE_FOLDER/site.yml" ./site.yml
-          cp "$ROLE_FOLDER/hosts.yml" ./hosts.yml
+      #     cp "$ROLE_FOLDER/site.yml" ./site.yml
+      #     cp "$ROLE_FOLDER/hosts.yml" ./hosts.yml
 
       - name: Create defaults/creds.yml file
         run: |
@@ -61,16 +61,18 @@ jobs:
 
       - name: Run playbook
         run: |
+          ROLE_FOLDER="${{ env.ROLE_FOLDER }}"
+
           echo "Running playbook site.yml with inventory hosts.yml"
 
           # Run the playbook
-          ansible-playbook -i hosts.yml site.yml --extra-vars "role_name=${ROLE_FOLDER}"
+          ansible-playbook -i $ROLE_FOLDER/hosts.yml $ROLE_FOLDER/site.yml --extra-vars "role_name=${ROLE_FOLDER}"
 
       - name: Conditional Cleanup
         if: ${{ env.CLEANUP == 'y' }}
         run: |
           echo "Cleaning up runtime files..."
-          rm -f site.yml hosts.yml
+          # rm -f site.yml hosts.yml
           rm -f ${{ env.ROLE_FOLDER }}/defaults/creds.yml
           echo "Cleanup complete!"
 
