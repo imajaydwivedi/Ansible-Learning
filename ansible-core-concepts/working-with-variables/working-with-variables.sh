@@ -292,6 +292,13 @@ Demo: Using Vault
 -> To create an encrypted file, use
     ansible-vault create sensitive_values
 
+    ---
+    ansible-vault create private/creds
+        # Here it would ask for "vault password". So remember this password
+        # Inside file, enter secrets in following "key: value" pair
+    PG_SUPERUSER_PWD: SomeStrongPassword
+    ---
+
 -> To view a vault encrypted file, use
     ansible-vault view sensitive_values
 
@@ -324,7 +331,7 @@ Managing Vault Files
 -----------------------------------------------
 
 -> When setting up projects with Vault encrypted files, it makes sense to use separate
-    files to stor encrypted and non-encrypted variables.
+    files to store encrypted and non-encrypted variables.
 
 -> To store host or host-group related variables files, you can use the following structure:
 
