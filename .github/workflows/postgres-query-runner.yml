@@ -1,0 +1,123 @@
+name: PostgreSQL Query Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      role_folder:
+        description: 'Query file to run (e.g., pg-query.yml)'
+        required: true
+        default: '<query-file>'
+      db_host:
+        description: 'Database host (e.g., localhost)'
+        required: true
+        default: 'localhost'
+      db_port:
+        description: 'Database port (e.g., 5432)'
+        required: true
+        default: '5432'
+      db_name:
+        description: 'Database name (e.g., stackoverflow)'
+        required: true
+        default: 'stackoverflow'
+      clean:
+        description: 'Cleanup temp files generated for playbook at end? (y/n)'
+        required: true
+        default: 'n'
+
+jobs:
+  validate-user:
+    runs-on: ubuntu
+    steps:
+      - name: Check if the actor is in the DBA team
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ORG_NAME: your-org-name
+          TEAM_SLUG: dba
+        run: |
+          echo "Triggered by: $GITHUB_ACTOR"
+
+          # Get team members
+          TEAM_MEMBERS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/orgs/$ORG_NAME/teams/$TEAM_SLUG/members)
+
+          # Check if actor is in the list
+          echo "$TEAM_MEMBERS" | grep "\"login\": \"$GITHUB_ACTOR\"" > /dev/null
+
+          if [ $? -ne 0 ]; then
+            echo "❌ Access denied. $GITHUB_ACTOR is not in the $TEAM_SLUG team."
+            exit 1
+          fi
+
+          echo "✅ $GITHUB_ACTOR is authorized. Proceeding with the workflow."
+
+  run-ansible-role:
+    runs-on: ubuntu
+    env:
+      ROLE_FOLDER: ${{ github.event.inputs.role_folder }}
+      PG_SUPERUSER_PWD: ${{ secrets.PG_SUPERUSER_PWD }}
+      PG_APPUSER: ${{ secrets.PG_APPUSER }}
+      PG_APPUSER_PWD: ${{ secrets.PG_APPUSER_PWD }}
+      CLEANUP: ${{ github.event.inputs.clean }}
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      # - name: Setup SSH private key
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "${{ secrets.ANSIBLE_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+      #     chmod 600 ~/.ssh/id_rsa
+
+      #     # Optional: Strict host key checking off (or use known_hosts)
+      #     echo "Host *" > ~/.ssh/config
+      #     echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+
+      # - name: Copy site.yml & hosts.yml to working directory
+      #   run: |
+      #     ROLE_FOLDER="${{ env.ROLE_FOLDER }}"
+
+      #     echo "Copying site.yml and hosts.yml from $ROLE_FOLDER"
+
+      #     cp "$ROLE_FOLDER/site.yml" ./site.yml
+      #     cp "$ROLE_FOLDER/hosts.yml" ./hosts.yml
+
+      - name: Create defaults/creds.yml file
+        run: |
+          ROLE_FOLDER="${{ env.ROLE_FOLDER }}"
+
+          rm -f $ROLE_FOLDER/defaults/creds.yml
+          touch $ROLE_FOLDER/defaults/creds.yml
+          echo creds: >> $ROLE_FOLDER/defaults/creds.yml
+          echo \ \ PG_SUPERUSER_PWD: $PG_SUPERUSER_PWD >> $ROLE_FOLDER/defaults/creds.yml
+          echo \ \ PG_APPUSER: $PG_APPUSER >> $ROLE_FOLDER/defaults/creds.yml
+          echo \ \ PG_APPUSER_PWD: $PG_APPUSER_PWD >> $ROLE_FOLDER/defaults/creds.yml
+
+          cat $ROLE_FOLDER/defaults/creds.yml
+
+      - name: Run playbook
+        run: |
+          ROLE_FOLDER="${{ env.ROLE_FOLDER }}"
+
+          echo "Running playbook site.yml with inventory hosts.yml"
+
+          # Run the playbook
+          ansible-playbook -i $ROLE_FOLDER/hosts.yml $ROLE_FOLDER/site.yml --extra-vars "role_name=${ROLE_FOLDER}"
+
+      - name: Conditional Cleanup
+        if: ${{ env.CLEANUP == 'y' }}
+        run: |
+          echo "Cleaning up runtime files..."
+          # rm -f site.yml hosts.yml
+          rm -f ${{ env.ROLE_FOLDER }}/defaults/creds.yml
+          echo "Cleanup complete!"
+
+      # - name: Clean up SSH key
+      #   if: always()  # ensures it runs even if previous steps fail
+      #   run: |
+      #     shred -u ~/.ssh/id_rsa
+      #     rm -rf ~/.ssh/config
+
+      - name: Status of action action
+        run: echo "${{ steps.custom.outputs.ansible-status }}"

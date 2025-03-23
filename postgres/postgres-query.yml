@@ -9,8 +9,10 @@
     pg_superuser: "postgres"
     pg_superuser_pwd: "{{ PG_SUPERUSER_PWD }}"
     sql_query: "SELECT * FROM users limit 5;"
+    pg_query_filename: "pg-query.sql"
+
   vars_files:
-    - "../private/creds.yml"
+    - "files/creds.yml"
   tasks:
     - name: Install PostgreSQL Client libraries
       ansible.builtin.package:
@@ -19,9 +21,9 @@
           - python3-psycopg2
         state: present
 
-    - name: Read query from file "{{ playbook_dir }}/pg-query.sql"
+    - name: Read query from file "{{ playbook_dir }}/files/{{pg_query_filename}}"
       ansible.builtin.slurp:
-        src: "{{ playbook_dir }}/pg-query.sql"
+        src: "{{ playbook_dir }}/files/{{pg_query_filename}}"
       register: pg_query_slurp
 
     - name: Decode the query
@@ -47,4 +49,4 @@
         var: query_result.query_result
 
 
-# ansible-playbook --vault-password-file=private/creds.yml postgres/postgres-query.yml
+# ansible-playbook --vault-password-file=private/vault-pass postgres/postgres-query.yml
