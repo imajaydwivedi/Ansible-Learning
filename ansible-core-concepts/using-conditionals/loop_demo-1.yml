@@ -1,0 +1,13 @@
+---
+- name: Demonstrate loop
+  hosts: localhost
+  tasks:
+    - name: Loop through Dictionary items passed locally within task
+      debug:
+        msg: "{{ item }}"
+      loop:
+        - vsftpd
+        - httpd
+        - sshd
+
+# ansible-playbook ansible-core-concepts/using-conditionals/loop_demo-1.yml

@@ -1,0 +1,33 @@
+---
+- name: Print disks to be created
+  ansible.builtin.debug:
+    msg: qemu-img create -f qcow2 {{ item.path }} {{ item.size_gb }}G
+  loop: "{{ vm_disks }}"
+
+- name: Ensure VM disk image exists
+  ansible.builtin.command:
+    cmd: qemu-img create -f qcow2 {{ item.path }} {{ item.size_gb }}G
+  args:
+    creates: "{{ item.path }}"
+  loop: "{{ vm_disks }}"
+
+- name: Define and start the VM using virt-install
+  ansible.builtin.command: >
+    virt-install
+    --name {{ vm_name }}
+    --memory {{ vm_ram_mb }}
+    --vcpus {{ vm_vcpus }}
+    {% for disk in vm_disks %}
+    --disk path={{ disk.path }},format=qcow2
+    {% endfor %}
+    {% for net in vm_networks %}
+    --network {{ net }}
+    {% endfor %}
+    --cdrom {{ guest_os_info.iso_image_path }}
+    --os-type {{ guest_os_info.os_type }}
+    --os-variant {{ guest_os_info.os_variant }}
+    --graphics vnc,listen=0.0.0.0
+    --noautoconsole
+  args:
+    creates: "/etc/libvirt/qemu/{{ vm_name }}.xml"
+

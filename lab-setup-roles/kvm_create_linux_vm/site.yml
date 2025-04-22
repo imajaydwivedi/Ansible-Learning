@@ -1,0 +1,13 @@
+- name: Create KVM VM
+  hosts: all
+  become: true
+  remote_user: ansible
+  gather_facts: true
+  any_errors_fatal: true
+
+  roles:
+    - role: kvm_create_linux_vm
+    # - role: "{{ role_name }}"
+      vars:
+        minimal_ansible_version: 2.11.0
+

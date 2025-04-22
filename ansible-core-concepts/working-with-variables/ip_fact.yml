@@ -1,0 +1,20 @@
+---
+- name: Get ip addresses using ansible_facts
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Show IP addresses
+      ansible.builtin.debug:
+        msg: >
+          This host uses IP address {{ ansible_facts.default_ipv4.address }}
+
+    - name: Pre 2.5 notation
+      ansible.builtin.debug:
+        msg: the IP address is {{ ansible_default_ipv4.address }}
+
+    - name: Current notation
+      ansible.builtin.debug:
+        msg: the IP address is {{ ansible_facts['default_ipv4']['address'] }}
+
+
+# ansible-playbook ansible-core-concepts/working-with-variables/ip_fact.yml

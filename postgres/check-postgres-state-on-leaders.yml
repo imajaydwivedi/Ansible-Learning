@@ -1,0 +1,37 @@
+---
+- name: Play to check status of PostgreSQL on leader nodes
+  hosts: all
+  gather_facts: false
+  tasks:
+    -
+    - name: Run checks on all nodes
+      ansible.builtin.debug:
+        msg: "Working on leader {{ inventory_hostname }}"
+
+    - name: Run checks only on all leader nodes
+      ansible.builtin.debug:
+        msg: "Working on leader {{ inventory_hostname }}"
+      when: inventory_hostname in groups['leaders']
+
+    - name: Run checks only on [leader] nodes
+      ansible.builtin.debug:
+        msg: "Working on leader {{ inventory_hostname }}"
+      when: inventory_hostname in groups['leader']
+
+    - name: Run checks only on [standby_leader] nodes
+      ansible.builtin.debug:
+        msg: "Working on leader {{ inventory_hostname }}"
+      when: inventory_hostname in groups['standby_leader']
+
+    - name: Run checks only on [replicas] nodes
+      ansible.builtin.debug:
+        msg: "Working on leader {{ inventory_hostname }}"
+      when: inventory_hostname in groups['replicas']
+
+    - name: Run checks only on [replicas] nodes
+      ansible.builtin.debug:
+        msg: "Working on leader {{ inventory_hostname }}"
+      when: inventory_hostname in groups['standalone']
+
+# ansible-playbook postgres/check-postgres-state-on-leaders.yml -i hosts_all.yml
+

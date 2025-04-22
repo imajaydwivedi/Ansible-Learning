@@ -1,0 +1,12 @@
+---
+- name: POC to extract a particular directory element in a list
+  hosts: all
+  gather_facts: false
+  vars_files:
+    - "{{playbook_dir}}/dummy-playbook-variables.yml"
+  tasks:
+  - name: Print the list of non_packaged_softwares
+    debug:
+      # var: non_packaged_softwares
+      # msg: "{{playbook_dir}}/dummy-playbook-variables.yml"
+      msg: "{{ non_packaged_softwares | map(attribute='friendly_name') | join(', ') }}"

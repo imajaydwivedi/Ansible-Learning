@@ -1,0 +1,23 @@
+---
+- name: first play
+  hosts: localhost
+  tasks:
+  - ansible.builtin.debug:
+      msg: task one
+  - ansible.builtin.debug:
+      msg: task two
+  tags: first
+
+- name: second play
+  hosts: localhost
+  tasks:
+  - ansible.builtin.debug:
+      msg: task three
+  - ansible.builtin.debug:
+      msg: task four
+  tags: second
+
+# ansible-playbook ansible-core-concepts/best-practices-and-optimizations/tag-demo.yml
+# ansible-playbook ansible-core-concepts/best-practices-and-optimizations/tag-demo.yml --tag=first
+# ansible-playbook ansible-core-concepts/best-practices-and-optimizations/tag-demo.yml --tag=second
+

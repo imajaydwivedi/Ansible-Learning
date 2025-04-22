@@ -1,0 +1,54 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for poc-role
+- name: Include defaults/creds.yml file
+  include_vars:
+    file: ../defaults/creds.yml
+
+- name: Use the default/creds.yml file variables for testing
+  ansible.builtin.debug:
+    #var: creds
+    msg: "username: {{ creds.PG_APPUSER }} || password: {{ creds.PG_APPUSER_PWD }}"
+
+- name: Debug variables
+  ansible.builtin.debug:
+    var: other_datacenter_nodes
+
+- name: Running poc-role
+  ansible.builtin.template:
+    src: poc-role.j2
+    dest: /tmp/etc_hosts
+  when: other_datacenter_nodes is defined
+
+- name: Check if /tmp/etc_hosts exists
+  ansible.builtin.stat:
+    path: /tmp/etc_hosts
+  register: myfile_status
+
+- name: Read /tmp/etc_hosts file content
+  ansible.builtin.slurp:
+    src: /tmp/etc_hosts
+  register: file_content_raw
+  when: myfile_status.stat.exists
+
+- name: Show /tmp/etc_hosts file content
+  debug:
+    msg: "{{ (file_content_raw['content'] | b64decode).splitlines() }}"
+  when: file_content_raw is defined
+
+# - name: Show /tmp/etc_hosts file content
+#   ansible.builtin.debug:
+#     msg: "{{ item }}"
+#   loop: "{{ lookup('file', '/tmp/etc_hosts').splitlines() }}"
+#   when: myfile_status.stat.exists
+
+# - name: Show /tmp/etc_hosts file content
+#   ansible.builtin.debug:
+#     msg: "{{ lookup('file', '/tmp/etc_hosts').splitlines() }}"
+#   when: myfile_status.stat.exists
+
+# - name: Show /tmp/etc_hosts file content
+#   debug: msg="{{item}}"
+#   with_lines: cat /tmp/etc_hosts
+#   when: myfile_status.stat.exists
+

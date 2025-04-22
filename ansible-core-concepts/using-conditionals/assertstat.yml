@@ -1,0 +1,15 @@
+---
+- name: sample of stat and assert
+  hosts: server_ansible
+  tasks:
+  - name: stat a directory
+    stat:
+      path: /etc/hosts
+    register: sta
+  - name: assert that /etc/hosts is a directory
+    ansible.builtin.assert:
+      that: sta.stat.isdir
+
+# ansible server_ansible -m stat -a 'path=/etc/hosts'
+# ansible-playbook ansible-core-concepts/using-conditionals/assertstat.yml
+

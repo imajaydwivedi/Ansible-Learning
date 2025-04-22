@@ -1,0 +1,3 @@
+{% for host in groups['ansible_vms'] %}
+{{ hostvars[host]['ansible_default_ipv4']['address'] }}  {{ hostvars[host]['ansible_hostname'] }}
+{% endfor %}

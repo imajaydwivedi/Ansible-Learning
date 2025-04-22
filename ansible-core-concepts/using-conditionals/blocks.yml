@@ -1,0 +1,24 @@
+---
+- name: simple block example
+  hosts: ansible_vms
+  vars:
+    mypackage: httpd
+  tasks:
+  - name: setting up {{ mypackage }}
+    when: ansible_os_family == "RedHat"
+    block:
+    - name: installing {{ mypackage }}
+      ansible.builtin.yum:
+        name: "{{ mypackage }}"
+        state: present
+    - name: restart {{ mypackage }}
+      ansible.builtin.service:
+        name: "{{ mypackage }}"
+        state: started
+
+
+# ansible all -m setup -a "filter=ansible_os_family"
+# ansible all -m setup | grep -i family
+# ansible all -m setup | less
+
+# ansible-playbook ansible-core-concepts/using-conditionals/blocks.yml

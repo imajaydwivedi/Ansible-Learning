@@ -1,0 +1,9 @@
+- name: Run the {{ role_name }} role
+  hosts: all
+  gather_facts: true
+  # any_errors_fatal: true
+  become: true
+
+  roles:
+    - "{{ role_name }}"
+    # - role: github-action-poc-project

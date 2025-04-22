@@ -1,0 +1,38 @@
+---
+- name: Example Playbook Using selectattr Filter
+  hosts: localhost
+  vars:
+    users:
+      - name: alice
+        active: true
+        role: admin
+      - name: bob
+        active: false
+        role: user
+      - name: caroline
+        active: true
+        role: user
+      - name: diana
+        active: false
+        role: guest
+  tasks:
+    - name: filter active users
+      set_fact:
+        active_users: "{{ users | selectattr('active', 'equalto', true) | list }}"
+    - name: display active users
+      debug:
+        var: active_users
+    - name: filter inactive users
+      set_fact:
+        inactive_users: "{{ users | selectattr('active', 'equalto', false) | list }}"
+    - name: display inactive users
+      debug:
+        var: inactive_users
+    - name: filter users by role 'user'
+      set_fact:
+        user_role_users: "{{ users | selectattr('role', 'equalto', 'user') | list }}"
+    - name: display users with role 'user'
+      debug:
+        var: user_role_users
+
+# ansible-playbook ansible-core-concepts/using-filters/selectattr.yaml

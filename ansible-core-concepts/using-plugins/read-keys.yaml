@@ -1,0 +1,32 @@
+---
+- name: read user ssh keys
+  hosts: server_ansible
+  #ignore_errors: yes
+  become: yes
+  vars:
+    users:
+    - student
+    - anant
+  tasks:
+    - name: create users
+      user:
+        name: "{{ item }}"
+      loop: "{{ users }}"
+    - name: print variables
+      ansible.builtin.debug:
+        msg: 'volatile/ssh_keys/{{ item }}/id_rsa.pub'
+      loop: "{{ users }}"
+    - name: check file
+      ansible.builtin.stat:
+        path: 'volatile/ssh_keys/{{ item }}/id_rsa.pub'
+      loop: "{{ users }}"
+    - name: add authorized keys
+      authorized_key:
+        user: "{{ item }}"
+        key: "{{ lookup('file', '/home/saanvi/GitHub/Ansible-Learning/volatile/ssh_keys/{{ item }}/id_rsa.pub') }}"
+      loop: "{{ users }}"
+
+# mkdir volatile/ssh_keys/{student,anant}
+# cp ~/.ssh/id_rsa.pub volatile/ssh_keys/student/
+# cp ~/.ssh/id_rsa.pub volatile/ssh_keys/anant/
+# ansible-playbook ansible-core-concepts/using-plugins/read-keys.yaml

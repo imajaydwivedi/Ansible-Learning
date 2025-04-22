@@ -1,0 +1,18 @@
+- name: Ping all servers
+  hosts: servers
+  gather_facts: false
+  tasks:
+    - name: Ping the host
+      ansible.builtin.ping:
+
+
+# sudo cp /home/ansible/.ssh/id_ed25519 ./private/ansible.key
+# chown $USER:$USER ./private/ansible.key
+# chmod 750 ./private/ansible.key
+
+# ssh -i private/ansible.key ansible@hostname
+# ansible -i inventory-github-action servers -m ping
+# ansible-playbook -i inventory-github-action github-action-based-deployment/ping-test.yml
+
+# Github Secrets -> ANSIBLE_PRIVATE_KEY, PG_APPUSER, PG_APPUSER_PWD, PG_SUPERUSER_PWD
+

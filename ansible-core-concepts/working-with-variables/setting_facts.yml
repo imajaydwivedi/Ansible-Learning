@@ -1,0 +1,20 @@
+---
+- name: set_fact demo
+  hosts: localhost
+  tasks:
+    - name: Setting host facts
+      ansible.builtin.set_fact:
+        myfirstfact: tuesday
+        mysecondfact: evening
+    - name: Print the custom facts
+      ansible.builtin.debug:
+        msg: Recording this on {{ myfirstfact }} {{ mysecondfact }}
+
+- name: Another play in same playbook
+  hosts: localhost
+  tasks:
+    - name: Access the previously set custom facts and display
+      ansible.builtin.debug:
+        msg: It is still {{ myfirstfact }} {{ mysecondfact }}
+
+# ansible-playbook ansible-core-concepts/working-with-variables/setting_facts.yml 

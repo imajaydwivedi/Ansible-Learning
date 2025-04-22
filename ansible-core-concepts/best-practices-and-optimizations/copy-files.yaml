@@ -1,0 +1,15 @@
+- name: copy files between hosts
+  hosts: server_ansible
+  tasks:
+  - name: copy file from pgprod to server_ansible
+    ansible.builtin.copy:
+      src: /etc/hosts
+      dest: /tmp/hosts
+    delegate_to: pgprod
+  - name: check file
+    ansible.builtin.stat:
+      path: /tmp/hosts
+    register: stafile
+  - name: print result
+    ansible.builtin.debug:
+      var: stafile

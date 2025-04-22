@@ -1,0 +1,7 @@
+myusers:
+  - uname: anna
+    ugroups: wheel
+  - uname: linda
+    ugroups: users
+  - uname: lisa
+    ugroups: dba

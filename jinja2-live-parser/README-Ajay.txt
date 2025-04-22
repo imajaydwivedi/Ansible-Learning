@@ -1,0 +1,1 @@
+yq -j eval <filename>

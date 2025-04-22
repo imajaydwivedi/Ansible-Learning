@@ -1,0 +1,13 @@
+---
+- name: Test command result
+  hosts: localhost
+  tasks:
+    - name: Print ansible_date_time
+      ansible.builtin.debug:
+        var: ansible_date_time
+    - name: Test my knowledge of the weekday
+      ansible.builtin.debug:
+        msg: I am sure that today is Friday
+      when: '"Friday" == ansible_date_time.weekday'
+
+# ansible-playbook ansible-core-concepts/using-conditionals/weekday_test.yml

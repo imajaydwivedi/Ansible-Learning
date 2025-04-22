@@ -1,0 +1,18 @@
+all:
+  children:
+    leaders:
+      children:
+        leader:
+          hosts:
+            pg-mum-prod-cls1-node1:
+        standby_leader:
+          hosts:
+            # pg-del-prod-cls1-node1:
+    replicas:
+      hosts:
+        pg-mum-prod-cls1-node0:
+        pg-mum-prod-cls1-node2:
+        # pg-del-prod-cls1-node0:
+        # pg-del-prod-cls1-node2:
+
+# ansible-inventory -i hosts_dummy.yml --list

@@ -1,0 +1,16 @@
+non_packaged_softwares:
+  - name: code
+    friendly_name: Visual Studio Code
+    url: "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+
+  - name: code-insiders
+    friendly_name: Visual Studio Code Insiders
+    url: "https://code.visualstudio.com/sha/download?build=insider&os=linux-deb-x64"
+
+  - name: zoom
+    friendly_name: Zoom
+    url: "https://zoom.us/client/latest/zoom_amd64.deb"
+
+  - name: google-chrome
+    friendly_name: Google Chrome
+    url: "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"

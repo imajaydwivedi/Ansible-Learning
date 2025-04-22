@@ -1,0 +1,16 @@
+---
+- hosts: server_ansible
+  ignore_errors: yes
+  tasks:
+  - name: trying to copy multiple files from control to host
+    copy:
+      src: '{{inventory_dir}}/*'
+      dest: /tmp
+  - name: trying to copy multiple files from control to host
+    ansible.builtin.synchronize:
+      src: '{{inventory_dir}}/*'
+      dest: /tmp/
+
+
+
+

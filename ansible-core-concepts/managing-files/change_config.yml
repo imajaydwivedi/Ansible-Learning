@@ -1,0 +1,35 @@
+---
+- name: Find config
+  hosts: server_ansible
+  tasks:
+    - name: create ansible project directory
+      ansible.builtin.file:
+        path: /home/ansible/rhce8-live/postgres-deployment
+        state: directory
+    - name: create ansible project config file
+      ansible.builtin.file:
+        path: /home/ansible/rhce8-live/postgres-deployment/ansible.cfg
+        state: touch
+    - name: find ansible.cfg files
+      ansible.builtin.find:
+        paths: /home/ansible/rhce8-live
+        patterns: 'ansible.cfg'
+        recurse: yes
+      register: output
+    - name: print output files
+      ansible.builtin.debug:
+        var: item.path
+      with_items: "{{ output.files }}"
+    - name: Add host variables into found remote ansible.cfg files
+      ansible.builtin.blockinfile:
+        path: "{{ item.path }}"
+        insertafter: "defaults"
+        marker: "##<!-- {mark} ANSIBLE MANAGED BLOCK -->##"
+        block: |
+          fact_caching = redis
+          fact_caching_timeout = 3600
+          fact_caching_connection = localhost:6379:0
+      with_items: "{{ output.files }}"
+
+# ansible-playbook ansible-core-concepts/managing-files/change_config.yml
+

@@ -1,0 +1,3 @@
+creds:
+  PG_DB_USER: postgres
+  PG_DB_USER_PWD: 'SomeStrongPassword$Here'

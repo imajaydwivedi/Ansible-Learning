@@ -1,0 +1,13 @@
+users:
+  ajay:
+    username: ajay
+    homedir: /home/ajay
+    shell: /bin/bash
+  anant:
+    username: anant
+    homedir: /home/anant
+    shell: /bin/bash
+  saanvi:
+    username: saanvi
+    homedir: /home/saanvi
+    shell: /bin/bash

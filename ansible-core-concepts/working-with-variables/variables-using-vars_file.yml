@@ -1,0 +1,14 @@
+---
+- name: variables demo
+  gather_facts: no
+  vars_files:
+    - varfile
+  hosts: ansible_vms
+  tasks:
+    - name: creating user {{ myuser }}
+      # ansible-doc --list | grep -i user
+      ansible.builtin.user:
+        name: "{{ myuser }}"
+        shell: /bin/bash
+
+# ansible-playbook ansible-core-concepts/working-with-variables/variables-using-vars_file.yml

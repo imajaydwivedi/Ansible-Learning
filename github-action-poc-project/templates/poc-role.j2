@@ -1,0 +1,7 @@
+{% if other_datacenter_nodes is defined %}
+
+{% for node in other_datacenter_nodes %}
+{{ node.ip }}    {{ node.name }}
+{% endfor %}
+
+{% endif %}

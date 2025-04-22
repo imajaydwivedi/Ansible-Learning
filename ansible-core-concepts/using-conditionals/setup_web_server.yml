@@ -1,0 +1,28 @@
+---
+- name: Setup web server
+  hosts: server_ansible
+  #force_handlers: true
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: latest
+    - name: Copy index.html
+      copy:
+        src: /tmp/index.html
+        dest: /var/www/html/index.html
+      notify:
+        - restart_web
+    - name: Copy nothing - intended to fail
+      copy:
+        src: /tmp/nothing
+        dest: /var/www/html/nothing.html
+  handlers:
+    - name: restart_web
+      service:
+        name: httpd
+        state: restarted
+
+# ansible localhost -m file -a "path=/tmp/index.html state=touch"
+# ansible server_ansible -m file -a "name=/var/www/html/index.html state=absent"
+# ansible-playbook ansible-core-concepts/using-conditionals/setup_web_server.yml

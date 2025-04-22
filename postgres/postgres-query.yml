@@ -1,0 +1,52 @@
+---
+- name: Playbook to interact with Postgres
+  hosts: localhost
+  gather_facts: false
+  vars:
+    db_host: "localhost"
+    db_port: "5432"
+    db_name: "stackoverflow"
+    pg_superuser: "postgres"
+    pg_superuser_pwd: "{{ PG_SUPERUSER_PWD }}"
+    sql_query: "SELECT * FROM users limit 5;"
+    pg_query_filename: "pg-query.sql"
+
+  vars_files:
+    - "files/creds.yml"
+  tasks:
+    - name: Install PostgreSQL Client libraries
+      ansible.builtin.package:
+        name:
+          - libpq-dev
+          - python3-psycopg2
+        state: present
+
+    - name: Read query from file "{{ playbook_dir }}/files/{{pg_query_filename}}"
+      ansible.builtin.slurp:
+        src: "{{ playbook_dir }}/files/{{pg_query_filename}}"
+      register: pg_query_slurp
+
+    - name: Decode the query
+      set_fact:
+        pg_query: "{{ pg_query_slurp.content | b64decode }}"
+
+    - name: Show the query
+      debug:
+        var: pg_query
+
+    - name: Run SQL query on PostgreSQL
+      community.postgresql.postgresql_query:
+        db: "{{ db_name }}"
+        login_user: "{{ pg_superuser }}"
+        login_password: "{{ pg_superuser_pwd }}"
+        login_host: "{{ db_host }}"
+        login_port: "{{ db_port }}"
+        query: "{{ pg_query }}"
+      register: query_result
+
+    - name: Show the query result
+      debug:
+        var: query_result.query_result
+
+
+# ansible-playbook --vault-password-file=private/vault-pass postgres/postgres-query.yml

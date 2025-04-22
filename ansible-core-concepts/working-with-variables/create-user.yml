@@ -1,0 +1,20 @@
+---
+- name: Create a user
+  hosts: ansible_vms
+  vars_files:
+    - secret.yml
+  tasks:
+    - name: Creating user
+      ansible.builtin.user:
+        name: "{{ username }}"
+        password: "{{ pwhash }}"
+
+# Check "user" module help, and read about "password" parameter
+  # ansible-doc user
+
+# create vault password in a file. Ensure this "vault-pass" file is added to .gitignore
+  # echo password > vault-pass
+  # chmod 600 vault-pass
+
+# run playbook
+  # ansible-playbook --vault-password-file=ansible-core-concepts/working-with-variables/vault-pass ansible-core-concepts/working-with-variables/create-user.yml

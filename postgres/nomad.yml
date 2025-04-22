@@ -1,0 +1,14 @@
+- type: log
+  encoding: plain
+  enabled: true
+  paths:
+    - /var/log/consul/*.log
+
+  ignore_older: 36h
+  close_inactive: 5m
+  close_removed: true
+  clean_removed: true
+  fields:
+    topic: mum-prod-postgres-consul
+    cluster: sre-postgresql-consul
+    mode: consul_client

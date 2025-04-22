@@ -1,0 +1,12 @@
+namespace: imajaydwivedi
+name: my_collection
+version: 1.0.0
+readme: README.md
+authors:
+  - Ajay Dwivedi <ajay.dwivedi2007@gmail.com>
+description: >
+  Ansible collection that includes a custom filter plugin.
+license: Apache-2.0
+dependencies: {}
+repository: 'https://github.com/imajaydwivedi/Ansible-Learning'
+documentation: 'https://github.com/imajaydwivedi/Ansible-Learning/tree/dev/ansible-core-concepts/my_collection/README.md'

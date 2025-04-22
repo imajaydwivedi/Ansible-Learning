@@ -1,0 +1,22 @@
+all:
+  children:
+    postgres:
+      children:
+        standby_leader:
+          hosts:
+            pg-del-prod-cls1-node1:
+        replicas:
+          hosts:
+            pg-del-prod-cls1-node0:
+            pg-del-prod-cls1-node2:
+
+# ansible-inventory -i postgres/hosts_dr.yml --list
+
+# Get all postgres servers
+# ansible all -i postgres/hosts_dr.yml -m debug -a "msg=\"{{ groups['postgres'] }}\" "
+
+# Get only standby_leader servers
+# ansible all -i postgres/hosts_dr.yml -m debug -a "msg=\"{{ groups['standby_leader'] }}\" "
+
+# Get only replicas servers
+# ansible all -i postgres/hosts_dr.yml -m debug -a "msg=\"{{ groups['replicas'] }}\" "

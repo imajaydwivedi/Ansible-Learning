@@ -1,0 +1,15 @@
+---
+- name: Demo register
+  hosts: server_ansible
+  tasks:
+    - name: Run task & store its result in register
+      ansible.builtin.command: date
+      register: thisdate
+    - name: Print register variable
+      ansible.builtin.debug:
+        var: thisdate
+    - name: Print actual command result from register
+      ansible.builtin.debug:
+        msg: the date is {{ thisdate['stdout'] }}
+
+# ansible-playbook ansible-core-concepts/working-with-variables/reg_var.yml

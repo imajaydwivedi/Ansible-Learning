@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2024 Ajay Dwivedi
+Copyright (c) 2017 Antonin Bourguignon
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

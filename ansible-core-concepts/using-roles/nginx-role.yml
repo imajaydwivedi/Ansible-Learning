@@ -1,0 +1,12 @@
+---
+- name: use galaxy nginx role
+  hosts: server_ansible
+
+  pre_tasks:
+    - name: remove httpd which shares same port
+      ansible.builtin.package:
+        name: httpd
+        state: absent
+
+  roles:
+    - role: geerlingguy.nginx

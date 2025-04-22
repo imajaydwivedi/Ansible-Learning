@@ -1,0 +1,9 @@
+---
+# defaults file for poc-role
+other_datacenter_nodes:
+  - name: server_ansible
+    ip: 192.168.100.31
+  - name: server_centos
+    ip: 192.168.100.32
+  - name: server_desktop
+    ip: 192.168.100.39

@@ -1,0 +1,20 @@
+---
+- name: Demo of "when" conditional
+  hosts: ansible_vms
+  vars:
+    supported_distros:
+      - CentOS
+      - Fedora
+      - RedHat
+    mypackage: nmap
+  tasks:
+    - name: Print ansible_distribution for verification
+      ansible.builtin.debug:
+        msg: The ansible_distribution is {{ ansible_distribution }}
+    - name: Install RH family specific packages
+      ansible.builtin.yum:
+        name: "{{ mypackage }}"
+        state: present
+      when: ansible_distribution in supported_distros
+
+# ansible-playbook ansible-core-concepts/using-conditionals/distro.yml

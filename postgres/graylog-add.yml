@@ -1,0 +1,39 @@
+---
+- name: Playbook to graylog scanning
+  hosts: localhost
+  tasks:
+  - name: Read the nomad.yml content
+    ansible.builtin.slurp:
+      src: "{{playbook_dir}}/nomad.yml"
+    register: nomad_file
+
+  - name: Decode nomad.yml content
+    ansible.builtin.set_fact:
+      nomad_content: "{{ nomad_file.content | b64decode }}"
+
+  - name: Print the content of nomad.yml
+    ansible.builtin.debug:
+      var: nomad_content
+
+  - name: Extract indentation before cluster line
+    ansible.builtin.set_fact:
+      cluster_indent: "{{ (nomad_content | regex_search('^(\\s*)cluster:', '\\1', multiline=True))[0] }}"
+
+  - name: Print indentation
+    ansible.builtin.debug:
+      msg: "Indentation is '{{ cluster_indent | length }}' spaces: '{{ cluster_indent }}'"
+
+  - name: Insert application_name with fixed indentation
+    ansible.builtin.lineinfile:
+      path: "{{ playbook_dir }}/nomad.yml"
+      insertafter: '^\s*cluster:.*'
+      line: '{{ cluster_indent }}application_name: pg-mum-prod-cls1'
+
+  - name: Comment out line starting with 'cluster:'
+    ansible.builtin.lineinfile:
+      path: "{{ playbook_dir }}/nomad.yml"
+      regexp: '^(\s*)cluster:(.*)'
+      line: '\1#cluster:\2'
+      backrefs: yes
+
+# ansible-playbook postgres/graylog-add.yml

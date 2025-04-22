@@ -1,0 +1,54 @@
+- name: Remove non-MP4 files recursively
+  hosts: localhost
+  gather_facts: no
+  vars:
+    target_directory: "/media/saanvi/128gb/Study/BrentOzar-Recordings"  # Change this to your target directory
+  tasks:
+    # - name: Find all files on {{ target_directory }}
+    #   ansible.builtin.find:
+    #     paths: "{{ target_directory }}"
+    #     recurse: yes
+    #     file_type: file
+    #   register: found_files
+
+    # - name: Remove files that are NOT .mp4
+    #   ansible.builtin.file:
+    #     path: "{{ item.path }}"
+    #     state: absent
+    #   loop: "{{ found_files.files }}"
+    #   when: item.path | regex_search('\.mp4$', ignorecase=True) is not true
+
+    - name: Remove non-mp4 files in parallel
+      ansible.builtin.shell:
+        cmd: "find {{ target_directory }} -type f ! -name '*.mp4' -delete"
+      async: 300  # Allow up to 5 minutes
+      poll: 0  # Run in the background
+      changed_when: true
+      register: job_task # Captures the job ID
+
+    - name: Debug Job ID
+      ansible.builtin.debug:
+        msg: "Job ID is {{ job_task.ansible_job_id }}"
+
+    - name: Wait for file deletion tasks to complete
+      ansible.builtin.async_status:
+        jid: "{{ job_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 10
+      delay: 10
+
+    - name: Find all directories (to check for emptiness)
+      ansible.builtin.find:
+        paths: "{{ target_directory }}"
+        recurse: yes
+        file_type: directory
+      register: found_dirs
+
+    - name: Remove empty directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ found_dirs.files }}"
+      when: >
+        (lookup('ansible.builtin.shell', "find '{{ item.path }}' -mindepth 1 | wc -l", split_lines=False) | int) == 0

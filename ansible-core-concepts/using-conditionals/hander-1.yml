@@ -1,0 +1,17 @@
+---
+- name: Showing handlers
+  hosts: server_ansible
+  tasks:
+    - name: Copy a file
+      ansible.builtin.copy:
+        src: /tmp/index.html
+        dest: /var/www/html/index.html
+      notify:
+        - restart_web
+  handlers:
+    - name: restart_web
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+
+# ansible-playbook ansible-core-concepts/using-conditionals/hander-1.yml
