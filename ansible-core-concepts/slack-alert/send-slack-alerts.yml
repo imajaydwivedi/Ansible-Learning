@@ -6,12 +6,13 @@
   become: true
   gather_facts: false
   vars:
+    patronictl_log_file: /home/saanvi/GitHub/Ansible-Learning/private/patronictl_list.log
     slack_token: "{{ lookup('env', 'SLACK_BOT_TOKEN') }}"  # or hardcode token here
     slack_channel: "#sqlmonitor-alerts"  # or Slack channel ID like C12345678
     slack_channel_id: "C04LKQF9RGV"
     slack_thread_header: '*Patroni Cluster State on PostgreSQL Servers*'
     slack_message: |
-      "+ Cluster: facebook-prod-rpt (7483087698268431571) --------+---------+----+-----------+",
+      "+ Cluster: facebook-prod-rpt (7483087698268431571) -------------------+---------+----+-----------+",
       "| Member            | Host                                  | Role    | State   | TL | Lag in MB |",
       "+-------------------+---------------------------------------+---------+---------+----+-----------+",
       "| facebok-postgres0 | facebok-postgres0.prod.lab.com        | Replica | stopped |    |   unknown |",
@@ -149,6 +150,38 @@
         # color: good
         msg: "{{ slack_message_coded3 }}"
         parse: "full"
+
+    - name: Read content of patronictl_log_file
+      slurp:
+        src: "{{ patronictl_log_file }}"
+      register: patronictl_list_output
+
+    - name: Decode the file content
+      set_fact:
+        patronictl_list_content: "{{ patronictl_list_output['content'] | b64decode }}"
+
+    - name: Display file content using loop and split()
+      ansible.builtin.debug:
+        # msg: "{{ item }}"
+        msg: |
+          {{ item.split('\n') | join('\n') }}
+      when: patronictl_list_content is defined and item != ''
+      loop: "{{ patronictl_list_content.split('\n') }}"
+
+    - name: Send Patroni Cluster state results to thread
+      community.general.slack:
+        token: "{{ slack_token }}"
+        channel: "{{ slack_channel }}"
+        thread_id: "{{ slack_response['ts'] }}"
+        msg: |
+          ```
+          {{ item.split('\n') }}
+          ```
+        parse: "full"
+        # color: good
+      when: patronictl_list_content is defined and item != ''
+      loop: "{{ patronictl_list_content.split('\n') }}"
+
 
     - name: Send a message to be edited later on
       community.general.slack:
