@@ -6,7 +6,8 @@
   become: true
   gather_facts: false
   vars:
-    patronictl_log_file: /home/saanvi/GitHub/Ansible-Learning/private/patronictl_list.log
+    # patronictl_log_file: /home/saanvi/GitHub/Ansible-Learning/private/patronictl_list.log
+    patronictl_yaml_log_file: "{{ playbook_dir }}/patronictl_yaml_output.log"
     slack_token: "{{ lookup('env', 'SLACK_BOT_TOKEN') }}"  # or hardcode token here
     slack_channel: "#sqlmonitor-alerts"  # or Slack channel ID like C12345678
     slack_channel_id: "C04LKQF9RGV"
@@ -36,15 +37,14 @@
     slack_message_coded3: "``` {{ slack_message }} ```"
 
   tasks:
-    - name: Send Slack message using community.general.slack
-      community.general.slack:
-        token: "{{ slack_token }}"
-        msg: "{{ slack_message_coded2 }}"
-        channel: "{{ slack_channel }}"
-        # username: "AnsibleBot"
-        icon_emoji: ":robot_face:"
-        parse: "full"
-      # delegate_to: localhost
+    # - name: Send Slack message using community.general.slack
+    #   community.general.slack:
+    #     token: "{{ slack_token }}"
+    #     msg: "{{ slack_message_coded2 }}"
+    #     channel: "{{ slack_channel }}"
+    #     # username: "AnsibleBot"
+    #     icon_emoji: ":robot_face:"
+    #     parse: "full"
 
     - name: Send notification message via Slack all options
       community.general.slack:
@@ -56,7 +56,6 @@
         icon_url: http://www.example.com/some-image-file.png
         link_names: 0
         parse: 'none'
-      # delegate_to: localhost
 
     - name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured
         in Slack
@@ -127,12 +126,34 @@
         channel: "{{ slack_channel }}"
         msg: This message has &lt;brackets&gt; &amp; ampersands in plain text.
 
-    - name: Initial Threaded Slack message
-      community.general.slack:
-        channel: "{{ slack_channel }}"
-        token: "{{ slack_token }}"
-        msg: 'Starting a thread with my initial post.'
+    # - name: Initial Threaded Slack message
+    #   community.general.slack:
+    #     channel: "{{ slack_channel }}"
+    #     token: "{{ slack_token }}"
+    #     msg: 'Starting a thread with my initial post.'
+    #   register: slack_response
+
+    - name: Patroni Cluster State Thread Initial Message
       register: slack_response
+      community.general.slack:
+        token: "{{ slack_token }}"
+        channel: "{{ slack_channel }}"
+        blocks:
+          - type: "header"
+            text:
+              type: "plain_text"
+              text: "Patroni Cluster State on PostgreSQL Servers"
+              emoji: true
+          - type: "divider"
+          - type: "context"
+            elements:
+              - type: "mrkdwn"
+                text: ":white_check_mark: Healthy Clusters: *8*"
+          - type: "context"
+            elements:
+              - type: "mrkdwn"
+                text: ":X: UnHealthy Clusters: *2*"
+          - type: "divider"
 
     - name: Add more info to thread
       community.general.slack:
@@ -151,37 +172,123 @@
         msg: "{{ slack_message_coded3 }}"
         parse: "full"
 
-    - name: Read content of patronictl_log_file
+    - name: "Read content of {{patronictl_yaml_log_file}}"
       slurp:
-        src: "{{ patronictl_log_file }}"
-      register: patronictl_list_output
+        src: "{{ patronictl_yaml_log_file }}"
+      register: patronictl_list_output_yaml
 
-    - name: Decode the file content
+    - name: "Decode {{patronictl_yaml_log_file}} file content"
       set_fact:
-        patronictl_list_content: "{{ patronictl_list_output['content'] | b64decode }}"
+        patronictl_list_content_yaml: "{{ patronictl_list_output_yaml['content'] | b64decode}}"
 
-    - name: Display file content using loop and split()
-      ansible.builtin.debug:
-        # msg: "{{ item }}"
+    - name: Print content of patronictl_list_content_yaml
+      debug:
+        var: patronictl_list_content_yaml
+
+    - name: Trim empty lines, convert to YAML, and create list
+      ansible.builtin.set_fact:
+        # cluster_list: "{{ item | from_yaml }}"
+        cluster_list: "{{ cluster_list | default([]) + [item | from_yaml] }}"
+      when: patronictl_list_content_yaml is defined and item != ''
+      loop: "{{ patronictl_list_content_yaml.split('\n') }}"
+
+    - name: Print Cluster Result
+      debug:
+          msg: "{{ item | join('\n') | from_yaml }}"
+      loop: "{{ cluster_list }}"
+
+    - name: Construct Slack Message Per Cluster Level
+      vars:
+        cluster_dict: "{{ item | join('\n') | from_yaml }}"
+      debug:
         msg: |
-          {{ item.split('\n') | join('\n') }}
-      when: patronictl_list_content is defined and item != ''
-      loop: "{{ patronictl_list_content.split('\n') }}"
+          ClusterName: {{ cluster_dict[0].Cluster }}
+          Host: {{ cluster_dict[0].Host }}
+          Role: {{ cluster_dict[0].Role }}
+          State: {{ cluster_dict[0].State }}
+      loop: "{{ cluster_list }}"
 
-    - name: Send Patroni Cluster state results to thread
+    - name: Debug variable
+      debug:
+        msg: "{{ cluster_list[0] | join('\n') | from_yaml }}"
+
+    - name: Send Unhealthy Patroni Cluster state results to thread
+      vars:
+          cluster_dict: "{{ item | join('\n') | from_yaml }}"
+          cluster_name: "{{ cluster_dict[0].Cluster }}"
+          cluster_host_01: "{{ cluster_dict[0] }}"
+          cluster_host_02: "{{ cluster_dict[1] }}"
+          cluster_host_03: "{{ cluster_dict[2] }}"
+          good_roles:
+            - Leader
+            - Standby Leader
+            - Replica
+            - Sync Standby
+          good_states:
+            - running
+            - streaming
+          has_role_issue: >-
+            {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
+          has_state_issue: >-
+            {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
       community.general.slack:
         token: "{{ slack_token }}"
         channel: "{{ slack_channel }}"
         thread_id: "{{ slack_response['ts'] }}"
-        msg: |
-          ```
-          {{ item.split('\n') }}
-          ```
-        parse: "full"
-        # color: good
-      when: patronictl_list_content is defined and item != ''
-      loop: "{{ patronictl_list_content.split('\n') }}"
+        attachments:
+          - color: '#FF0000'
+            text: "Cluster: {{ cluster_name }}"
+            fields:
+              - title: "{{ cluster_host_01.Host }}"
+                value: "Role: {{ cluster_host_01.Role }} || State: {{ cluster_host_01.State }}"
+                short: true
+              - title: "{{ cluster_host_02.Host }}"
+                value: "Role: {{ cluster_host_02.Role }} || State: {{ cluster_host_02.State }}"
+                short: true
+              - title: "{{ cluster_host_03.Host }}"
+                value: "Role: {{ cluster_host_03.Role }} || State: {{ cluster_host_03.State }}"
+                short: true
+      when: has_role_issue or has_state_issue
+      loop: "{{ cluster_list }}"
 
+    - name: Send Healthy Patroni Cluster state results to thread
+      vars:
+          cluster_dict: "{{ item | join('\n') | from_yaml }}"
+          cluster_name: "{{ cluster_dict[0].Cluster }}"
+          cluster_host_01: "{{ cluster_dict[0] }}"
+          cluster_host_02: "{{ cluster_dict[1] }}"
+          cluster_host_03: "{{ cluster_dict[2] }}"
+          good_roles:
+            - Leader
+            - Standby Leader
+            - Replica
+            - Sync Standby
+          good_states:
+            - running
+            - streaming
+          has_role_issue: >-
+            {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
+          has_state_issue: >-
+            {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
+      community.general.slack:
+        token: "{{ slack_token }}"
+        channel: "{{ slack_channel }}"
+        thread_id: "{{ slack_response['ts'] }}"
+        attachments:
+          - color: good
+            text: "*Cluster: {{ cluster_name }}*"
+            fields:
+              - title: "{{ cluster_host_01.Host }}"
+                value: "Role: {{ cluster_host_01.Role }} || State: {{ cluster_host_01.State }}"
+                short: true
+              - title: "{{ cluster_host_02.Host }}"
+                value: "Role: {{ cluster_host_02.Role }} || State: {{ cluster_host_02.State }}"
+                short: true
+              - title: "{{ cluster_host_03.Host }}"
+                value: "Role: {{ cluster_host_03.Role }} || State: {{ cluster_host_03.State }}"
+                short: true
+      when: not (has_role_issue or has_state_issue)
+      loop: "{{ cluster_list }}"
 
     - name: Send a message to be edited later on
       community.general.slack:
