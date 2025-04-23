@@ -11,7 +11,16 @@
   tasks:
     - name: Trigger PagerDuty Alert for UnHealthy State
       vars:
-        cluster_name: "facebook-prod-cluster"
+            # cluster_dict: "{{ item | join('\n') | from_yaml }}"
+            cluster_name: "FFPTRM-CUG-CLUSTER"
+            # cluster_leader_host: ""
+            # cluster_host_01: "{{ cluster_dict[0] }}"
+            # cluster_host_02: "{{ cluster_dict[1] }}"
+            # cluster_host_03: "{{ cluster_dict[2] }}"
+            # has_role_issue: >-
+            #   {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
+            # has_state_issue: >-
+            #   {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
       community.general.pagerduty_alert:
         integration_key: "{{ pagerduty_integration_key }}"
         api_version: v2
@@ -32,5 +41,5 @@
       # loop: "{{ cluster_list }}"
 
 # cd ansible-core-concepts/slack-pagerduty-alert
-# export PAGERDUTY_INTEGRATION_KEY="your_pagerduty_integration_key"
+# export PAGERDUTY_INTEGRATION_KEY=<YouPagerDutyIntegrationKey>
 # ansible-playbook -i hosts.yml trigger-pagerduty-alert.yml
