@@ -12,7 +12,7 @@
     - name: Trigger PagerDuty Alert for UnHealthy State
       vars:
             # cluster_dict: "{{ item | join('\n') | from_yaml }}"
-            cluster_name: "FFPTRM-CUG-CLUSTER"
+            cluster_name: "FACEBOOK-PROD-CLUSTER"
             # cluster_leader_host: ""
             # cluster_host_01: "{{ cluster_dict[0] }}"
             # cluster_host_02: "{{ cluster_dict[1] }}"
