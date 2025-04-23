@@ -6,8 +6,8 @@
   become: true
   gather_facts: false
   vars:
-    # patronictl_log_file: /home/saanvi/GitHub/Ansible-Learning/private/patronictl_list.log
-    patronictl_yaml_log_file: "{{ playbook_dir }}/patronictl_yaml_output.log"
+    # patronictl_log_file: /home/saanvi/GitHub/Ansible-Learning/private/patronictl_list.txt
+    patronictl_yaml_log_file: "{{ playbook_dir }}/patronictl_yaml_output.txt"
     slack_token: "{{ lookup('env', 'SLACK_BOT_TOKEN') }}"  # or hardcode token here
     slack_channel: "#sqlmonitor-alerts"  # or Slack channel ID like C12345678
     slack_channel_id: "C04LKQF9RGV"
@@ -298,7 +298,7 @@
             | selectattr('Role', 'in', leader_roles)
             | map(attribute='Host')
             | list
-            | first }}
+            | first | default(cluster_host_02.Host)}}
       community.general.slack:
         token: "{{ slack_token }}"
         channel: "{{ slack_channel }}"
