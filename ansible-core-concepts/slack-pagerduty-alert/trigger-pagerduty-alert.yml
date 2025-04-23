@@ -1,0 +1,36 @@
+---
+- name: Playbook to send PagerDuty Alert
+  hosts: localhost
+  become_user: root
+  remote_user: ansible
+  # become: true
+  gather_facts: false
+  vars:
+    # pagerduty_integration_key: "{{ PAGERDUTY_INTEGRATION_KEY }}"
+    pagerduty_integration_key: "{{ lookup('env', 'PAGERDUTY_INTEGRATION_KEY') }}"  # or hardcode token here
+  tasks:
+    - name: Trigger PagerDuty Alert for UnHealthy State
+      vars:
+        cluster_name: "facebook-prod-cluster"
+      community.general.pagerduty_alert:
+        integration_key: "{{ pagerduty_integration_key }}"
+        api_version: v2
+        source: Github Workflow [Check Cluster State]
+        state: triggered
+        desc: |
+          Patroni Cluster [{{ cluster_name }}] in UnHealthy State
+        incident_key: "{{ cluster_name }}"
+        client: PostgreSQL Ansible Alert
+        client_url: https://ajaydwivedi.pagerduty.com/service-directory/PTGZFDD/activity
+        component: patronictl
+        incident_class: patroni cluster issue
+        link_url: https://ajaydwivedi.pagerduty.com/service-directory/PTGZFDD/activity
+        link_text: Active PagerDuty Alerts
+      # when:
+      #   - has_role_issue or has_state_issue
+      #   - clusters_to_ignore is not defined or cluster_name not in clusters_to_ignore
+      # loop: "{{ cluster_list }}"
+
+# cd ansible-core-concepts/slack-pagerduty-alert
+# export PAGERDUTY_INTEGRATION_KEY="your_pagerduty_integration_key"
+# ansible-playbook -i hosts.yml trigger-pagerduty-alert.yml
