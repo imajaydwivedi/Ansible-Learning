@@ -20,6 +20,7 @@
         headers:
           Content-Type: "application/json"
         body_format: json
+        status_code: 202  # PagerDuty returns 202 Accepted for success
         body:
           dedup_key: "{{ cluster_name }}"
           routing_key: "{{ pagerduty_integration_key }}"
@@ -74,7 +75,7 @@
         incident_class: patroni cluster issue
         link_url: https://ajaydwivedi.pagerduty.com/service-directory/PTGZFDD/activity
         link_text: Active PagerDuty Alerts
-      when: true
+      when: false
 
 # cd ansible-core-concepts/slack-pagerduty-alert
 # export PAGERDUTY_INTEGRATION_KEY=<YouPagerDutyIntegrationKey>
