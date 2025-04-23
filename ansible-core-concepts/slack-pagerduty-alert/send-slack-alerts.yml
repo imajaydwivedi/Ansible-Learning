@@ -12,6 +12,17 @@
     slack_channel: "#sqlmonitor-alerts"  # or Slack channel ID like C12345678
     slack_channel_id: "C04LKQF9RGV"
     slack_thread_header: '*Patroni Cluster State on PostgreSQL Servers*'
+    good_roles:
+      - Leader
+      - Standby Leader
+      - Replica
+      - Sync Standby
+    good_states:
+      - running
+      - streaming
+    leader_roles:
+      - Leader
+      - Standby Leader
     slack_message: |
       "+ Cluster: facebook-prod-rpt (7483087698268431571) -------------------+---------+----+-----------+",
       "| Member            | Host                                  | Role    | State   | TL | Lag in MB |",
@@ -133,45 +144,6 @@
     #     msg: 'Starting a thread with my initial post.'
     #   register: slack_response
 
-    - name: Patroni Cluster State Thread Initial Message
-      register: slack_response
-      community.general.slack:
-        token: "{{ slack_token }}"
-        channel: "{{ slack_channel }}"
-        blocks:
-          - type: "header"
-            text:
-              type: "plain_text"
-              text: "Patroni Cluster State on PostgreSQL Servers"
-              emoji: true
-          - type: "divider"
-          - type: "context"
-            elements:
-              - type: "mrkdwn"
-                text: ":white_check_mark: Healthy Clusters: *8*"
-          - type: "context"
-            elements:
-              - type: "mrkdwn"
-                text: ":X: UnHealthy Clusters: *2*"
-          - type: "divider"
-
-    - name: Add more info to thread
-      community.general.slack:
-        channel: "{{ slack_channel }}"
-        token: "{{ slack_token }}"
-        thread_id: "{{ slack_response['ts'] }}"
-        color: good
-        msg: 'And this is my threaded response!'
-
-    - name: Add code block to thread
-      community.general.slack:
-        channel: "{{ slack_channel }}"
-        token: "{{ slack_token }}"
-        thread_id: "{{ slack_response['ts'] }}"
-        # color: good
-        msg: "{{ slack_message_coded3 }}"
-        parse: "full"
-
     - name: "Read content of {{patronictl_yaml_log_file}}"
       slurp:
         src: "{{ patronictl_yaml_log_file }}"
@@ -197,6 +169,104 @@
           msg: "{{ item | join('\n') | from_yaml }}"
       loop: "{{ cluster_list }}"
 
+    - name: Initialize counter
+      set_fact:
+        healthy_cluster_count: 0
+        unhealthy_cluster_count: 0
+        unhealthy_cluster_count_pagerduty: 0
+
+    - name: Compute unhealthy_cluster_count
+      vars:
+          cluster_dict: "{{ item | join('\n') | from_yaml }}"
+          cluster_name: "{{ cluster_dict[0].Cluster }}"
+          cluster_host_01: "{{ cluster_dict[0] }}"
+          cluster_host_02: "{{ cluster_dict[1] }}"
+          cluster_host_03: "{{ cluster_dict[2] }}"
+          has_role_issue: >-
+            {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
+          has_state_issue: >-
+            {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
+      set_fact:
+        unhealthy_cluster_count: "{{ unhealthy_cluster_count | int + 1 }}"
+      when:
+        - has_role_issue or has_state_issue
+        # - clusters_to_ignore is not defined or cluster_name not in clusters_to_ignore
+      loop: "{{ cluster_list }}"
+
+    - name: Compute unhealthy_cluster_count_pagerduty
+      vars:
+          cluster_dict: "{{ item | join('\n') | from_yaml }}"
+          cluster_name: "{{ cluster_dict[0].Cluster }}"
+          cluster_host_01: "{{ cluster_dict[0] }}"
+          cluster_host_02: "{{ cluster_dict[1] }}"
+          cluster_host_03: "{{ cluster_dict[2] }}"
+          has_role_issue: >-
+            {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
+          has_state_issue: >-
+            {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
+      set_fact:
+        unhealthy_cluster_count_pagerduty: "{{ unhealthy_cluster_count_pagerduty | int + 1 }}"
+      when:
+        - has_role_issue or has_state_issue
+        - clusters_to_ignore is not defined or cluster_name not in clusters_to_ignore
+      loop: "{{ cluster_list }}"
+
+    - name: Compute healthy_cluster_count
+      vars:
+          cluster_dict: "{{ item | join('\n') | from_yaml }}"
+          # cluster_name: "{{ cluster_dict[0].Cluster }}"
+          cluster_host_01: "{{ cluster_dict[0] }}"
+          cluster_host_02: "{{ cluster_dict[1] }}"
+          cluster_host_03: "{{ cluster_dict[2] }}"
+          has_role_issue: >-
+            {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
+          has_state_issue: >-
+            {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
+      set_fact:
+        healthy_cluster_count: "{{ healthy_cluster_count | int + 1 }}"
+      when:
+        - not (has_role_issue or has_state_issue)
+      loop: "{{ cluster_list }}"
+
+    - name: Patroni Cluster State Thread Initial Message
+      register: slack_response
+      community.general.slack:
+        token: "{{ slack_token }}"
+        channel: "{{ slack_channel }}"
+        blocks:
+          - type: "header"
+            text:
+              type: "plain_text"
+              text: "Patroni Cluster State on PostgreSQL Servers"
+              emoji: true
+          - type: "divider"
+          - type: "context"
+            elements:
+              - type: "mrkdwn"
+                text: ":white_check_mark: Healthy Clusters: *{{healthy_cluster_count}}*"
+          - type: "context"
+            elements:
+              - type: "mrkdwn"
+                text: ":X: UnHealthy Clusters: *{{unhealthy_cluster_count}}*"
+          - type: "divider"
+
+    - name: Add more info to thread
+      community.general.slack:
+        channel: "{{ slack_channel }}"
+        token: "{{ slack_token }}"
+        thread_id: "{{ slack_response['ts'] }}"
+        color: good
+        msg: 'And this is my threaded response!'
+
+    - name: Add code block to thread
+      community.general.slack:
+        channel: "{{ slack_channel }}"
+        token: "{{ slack_token }}"
+        thread_id: "{{ slack_response['ts'] }}"
+        # color: good
+        msg: "{{ slack_message_coded3 }}"
+        parse: "full"
+
     - name: Construct Slack Message Per Cluster Level
       vars:
         cluster_dict: "{{ item | join('\n') | from_yaml }}"
@@ -214,30 +284,28 @@
 
     - name: Send Unhealthy Patroni Cluster state results to thread
       vars:
-          cluster_dict: "{{ item | join('\n') | from_yaml }}"
-          cluster_name: "{{ cluster_dict[0].Cluster }}"
-          cluster_host_01: "{{ cluster_dict[0] }}"
-          cluster_host_02: "{{ cluster_dict[1] }}"
-          cluster_host_03: "{{ cluster_dict[2] }}"
-          good_roles:
-            - Leader
-            - Standby Leader
-            - Replica
-            - Sync Standby
-          good_states:
-            - running
-            - streaming
-          has_role_issue: >-
-            {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
-          has_state_issue: >-
-            {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
+        cluster_dict: "{{ item | join('\n') | from_yaml }}"
+        cluster_name: "{{ cluster_dict[0].Cluster }}"
+        cluster_host_01: "{{ cluster_dict[0] }}"
+        cluster_host_02: "{{ cluster_dict[1] }}"
+        cluster_host_03: "{{ cluster_dict[2] }}"
+        has_role_issue: >-
+          {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
+        has_state_issue: >-
+          {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
+        leader_host: >-
+          {{ cluster_dict
+            | selectattr('Role', 'in', leader_roles)
+            | map(attribute='Host')
+            | list
+            | first }}
       community.general.slack:
         token: "{{ slack_token }}"
         channel: "{{ slack_channel }}"
         thread_id: "{{ slack_response['ts'] }}"
         attachments:
           - color: '#FF0000'
-            text: "Cluster: {{ cluster_name }}"
+            text: "Cluster: {{ cluster_name }} || Leader: {{ leader_host }}"
             fields:
               - title: "{{ cluster_host_01.Host }}"
                 value: "Role: {{ cluster_host_01.Role }} || State: {{ cluster_host_01.State }}"
@@ -253,30 +321,28 @@
 
     - name: Send Healthy Patroni Cluster state results to thread
       vars:
-          cluster_dict: "{{ item | join('\n') | from_yaml }}"
-          cluster_name: "{{ cluster_dict[0].Cluster }}"
-          cluster_host_01: "{{ cluster_dict[0] }}"
-          cluster_host_02: "{{ cluster_dict[1] }}"
-          cluster_host_03: "{{ cluster_dict[2] }}"
-          good_roles:
-            - Leader
-            - Standby Leader
-            - Replica
-            - Sync Standby
-          good_states:
-            - running
-            - streaming
-          has_role_issue: >-
-            {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
-          has_state_issue: >-
-            {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
+        cluster_dict: "{{ item | join('\n') | from_yaml }}"
+        cluster_name: "{{ cluster_dict[0].Cluster }}"
+        cluster_host_01: "{{ cluster_dict[0] }}"
+        cluster_host_02: "{{ cluster_dict[1] }}"
+        cluster_host_03: "{{ cluster_dict[2] }}"
+        has_role_issue: >-
+          {{ cluster_host_01.Role not in good_roles or cluster_host_02.Role not in good_roles or cluster_host_03.Role not in good_roles }}
+        has_state_issue: >-
+          {{ cluster_host_01.State not in good_states or cluster_host_02.State not in good_states or cluster_host_03.State not in good_states }}
+        leader_host: >-
+          {{ cluster_dict
+            | selectattr('Role', 'in', leader_roles)
+            | map(attribute='Host')
+            | list
+            | first }}
       community.general.slack:
         token: "{{ slack_token }}"
         channel: "{{ slack_channel }}"
         thread_id: "{{ slack_response['ts'] }}"
         attachments:
           - color: good
-            text: "*Cluster: {{ cluster_name }}*"
+            text: "Cluster: {{ cluster_name }} || Leader: {{ leader_host }}"
             fields:
               - title: "{{ cluster_host_01.Host }}"
                 value: "Role: {{ cluster_host_01.Role }} || State: {{ cluster_host_01.State }}"
