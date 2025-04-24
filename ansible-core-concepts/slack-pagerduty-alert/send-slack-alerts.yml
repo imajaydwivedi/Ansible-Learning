@@ -12,6 +12,7 @@
     slack_channel: "#sqlmonitor-alerts"  # or Slack channel ID like C12345678
     slack_channel_id: "C04LKQF9RGV"
     slack_thread_header: '*Patroni Cluster State on PostgreSQL Servers*'
+    lag_in_mb_threshold: 100
     good_roles:
       - Leader
       - Standby Leader
@@ -174,6 +175,7 @@
         healthy_cluster_count: 0
         unhealthy_cluster_count: 0
         unhealthy_cluster_count_pagerduty: 0
+        lagged_cluster_count: 0
 
     - name: Compute unhealthy_cluster_count
       vars:
@@ -226,6 +228,23 @@
         healthy_cluster_count: "{{ healthy_cluster_count | int + 1 }}"
       when:
         - not (has_role_issue or has_state_issue)
+      loop: "{{ cluster_list }}"
+
+    - name: Compute lagged_cluster_count
+      vars:
+        cluster_dict: "{{ item | join('\n') | from_yaml }}"
+        cluster_host_01: "{{ cluster_dict[0] }}"
+        cluster_host_02: "{{ cluster_dict[1] }}"
+        cluster_host_03: "{{ cluster_dict[2] }}"
+        lag_in_mb: >-
+          {{
+            [cluster_host_01['Lag in MB'] | default(0), cluster_host_02['Lag in MB'] | default(0), cluster_host_03['Lag in MB'] | default(0)]
+            | select('number') | list | default([0], true) | max
+          }}
+      set_fact:
+        lagged_cluster_count: "{{ lagged_cluster_count | int + 1 }}"
+      when:
+        - (lag_in_mb | int) >= lag_in_mb_threshold
       loop: "{{ cluster_list }}"
 
     - name: Patroni Cluster State Thread Initial Message
@@ -299,13 +318,18 @@
             | map(attribute='Host')
             | list
             | first | default(cluster_host_02.Host)}}
+        lag_in_mb: >-
+          {{
+            [cluster_host_01['Lag in MB'] | default(0), cluster_host_02['Lag in MB'] | default(0), cluster_host_03['Lag in MB'] | default(0)]
+            | select('number') | list | default([0], true) | max
+          }}
       community.general.slack:
         token: "{{ slack_token }}"
         channel: "{{ slack_channel }}"
         thread_id: "{{ slack_response['ts'] }}"
         attachments:
           - color: '#FF0000'
-            text: "Cluster: {{ cluster_name }} || Leader: {{ leader_host }}"
+            text: "Cluster: {{ cluster_name }} || Leader: {{ leader_host }} || Lag_MB: {{ lag_in_mb }}"
             fields:
               - title: "{{ cluster_host_01.Host }}"
                 value: "Role: {{ cluster_host_01.Role }} || State: {{ cluster_host_01.State }}"
@@ -336,13 +360,18 @@
             | map(attribute='Host')
             | list
             | first }}
+        lag_in_mb: >-
+          {{
+            [cluster_host_01['Lag in MB'] | default(0), cluster_host_02['Lag in MB'] | default(0), cluster_host_03['Lag in MB'] | default(0)]
+            | select('number') | list | default([0], true) | max
+          }}
       community.general.slack:
         token: "{{ slack_token }}"
         channel: "{{ slack_channel }}"
         thread_id: "{{ slack_response['ts'] }}"
         attachments:
           - color: good
-            text: "Cluster: {{ cluster_name }} || Leader: {{ leader_host }}"
+            text: "Cluster: {{ cluster_name }} || Leader: {{ leader_host }} || Lag_MB: {{ lag_in_mb }}"
             fields:
               - title: "{{ cluster_host_01.Host }}"
                 value: "Role: {{ cluster_host_01.Role }} || State: {{ cluster_host_01.State }}"
