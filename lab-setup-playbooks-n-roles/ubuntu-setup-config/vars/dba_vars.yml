@@ -18,7 +18,7 @@ bridge_network_ip: '192.168.1.0'
 bridge_hosts_entries:
   - 192.168.1.6 ryzen9
 
-ignore_internet_error: false
+ignore_internet_error: true
 
 # python_version: "python3.12"
 update_package_cache: true
