@@ -12,7 +12,7 @@
       msg: "Running playook -> {{ playbook_dir }}/configure-ubuntu-desktop.yml"
 
   roles:
-    # - packages
+    - packages
     # - guake
     # - ubuntu-mate-desktop
     # - cockpit
