@@ -1,4 +1,4 @@
-- name: Add VMs to AD
+- name: Configure VMs
   hosts: all
   become: true
   remote_user: ansible
@@ -9,7 +9,8 @@
     - sensitive_values
 
   roles:
-    - role: join_linux_to_ad
+    # - role: join_linux_to_ad
+    - role: ubuntu-setup-config
     # - role: "{{ role_name }}"
       vars:
         minimal_ansible_version: 2.11.0
@@ -22,4 +23,4 @@
   # ├── sensitive_values
   # ├── site.yml
   # └── vault-pass
-# ansible-playbook -i hosts.yml site.yml --vault-password-file=vault-pass
+# ansible-playbook -i hosts.yml site.yml --vault-password-file=../vault-pass

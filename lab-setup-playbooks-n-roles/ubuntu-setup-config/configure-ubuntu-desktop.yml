@@ -4,7 +4,7 @@
   vars:
     clear_screen: true
   vars_files:
-    - vars/desktop_vars.yml
+    - vars/dba_vars.yml
 
   pre_tasks:
   - name: Print host name
@@ -12,7 +12,6 @@
       msg: "Running playook -> {{ playbook_dir }}/configure-ubuntu-desktop.yml"
 
   roles:
-
     - packages
     # - guake
     # - ubuntu-mate-desktop

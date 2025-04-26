@@ -11,6 +11,14 @@
   sudo ufw allow ssh
 ```
 
+## Create ansible user & allow sudo without password
+```
+sudo adduser ansible
+sudo addgroup sudo-nopw
+sudo usermod -aG sudo-nopw ansible
+echo '%sudo-nopw ALL=(ALL:ALL) NOPASSWD:ALL' | tee /etc/sudoers.d/sudo-nopw > /dev/null'
+```
+
 ## Initial Setup of Ansible
 ```
 # Configure password less ssh
