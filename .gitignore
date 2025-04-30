@@ -29,6 +29,12 @@
 __pycache__/
 .DS_Store
 vault-pass
+vault-password
+vault_pass
+vailt_password
+vault-key
+vault_key
+sensitive_values
 
 
 # Ignore Virtual Env Folder
