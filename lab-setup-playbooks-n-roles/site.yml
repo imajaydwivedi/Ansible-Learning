@@ -9,8 +9,8 @@
     - sensitive_values
 
   roles:
-    # - role: join_linux_to_ad
-    - role: ubuntu-setup-config
+    - role: join_linux_to_ad
+    # - role: ubuntu-setup-config
     # - role: "{{ role_name }}"
       vars:
         minimal_ansible_version: 2.11.0

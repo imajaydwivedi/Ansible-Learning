@@ -16,6 +16,7 @@ core_packages:
   - snapd
   - vim
   - nano
+  - net-tools
 
 softwares:
   - timeshift
