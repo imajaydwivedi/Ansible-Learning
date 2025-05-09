@@ -4,6 +4,7 @@
     cmd: ping -c 1 google.com
   register: ping_result
   ignore_errors: yes
+  changed_when: false
 
 # - name: Check if internet is reachable
 #   ansible.netcommon.net_ping:

@@ -10,14 +10,16 @@
 - name: Check inventory_hostname/ansible_host
   ansible.builtin.debug:
     msg: "inventory_hostname: [{{inventory_hostname}}], ansible_host: [{{ansible_host}}]"
+  when: debug
 
 - name: Check ansible_facts
   ansible.builtin.debug:
-    msg: "ansible_hostname: [{{ansible_hostname}}], ansible_fqdn: [{{ansible_fqdn}}], ansible_nodename: [{{ansible_nodename}}]"
+    msg: "inventory_hostname: [{{inventory_hostname}}], ansible_fqdn: [{{ansible_fqdn}}], ansible_nodename: [{{ansible_nodename}}]"
+  when: debug
 
 - name: Change hostname to fqdn
   ansible.builtin.command: >
-    sudo hostnamectl set-hostname {{ansible_hostname}}.{{ad_domain}}
+    sudo hostnamectl set-hostname {{inventory_hostname}}.{{ad_domain}}
   when: ad_domain not in ansible_fqdn
 
 # ansible -i hosts.yml pgpoc -m setup -a "filter=ansible_interfaces"
@@ -62,6 +64,7 @@
       {%- if inet2_interface is defined and inet2_interface %}
       , [{{inet2_interface}}]=> {{inet2_network_ip}}
       {%- endif %}
+  when: debug
 
 # - name: Print /etc/hosts entries to be added
 #   ansible.builtin.debug:
@@ -117,7 +120,7 @@
   ansible.builtin.package:
     name: chrony
     state: present
-  when: ansible_hostname in groups['debian']
+  when: inventory_hostname in groups['debian']
 
 - name: Install redhat family packages
   ansible.builtin.package:
@@ -126,10 +129,10 @@
 
 - name: Install redhat non-fedora packages
   ansible.builtin.package:
-    name: "{{ rhel_packages }}"
+    name: "{{ redhat_packages }}"
   when:
     - ansible_facts['os_family'] == 'RedHat' and ansible_distribution != "Fedora"
-    - rhel_packages is defined
+    - redhat_packages is defined
 
 - name: Install Fedora-specific packages
   ansible.builtin.package:
@@ -138,10 +141,10 @@
 
 - name: Enable and start chrony service
   ansible.builtin.systemd:
-    name: chrony
+    name: chronyd
     enabled: true
     state: started
-  when: ansible_hostname in groups['debian']
+  # when: inventory_hostname in groups['debian']
 
 - name: Check if server is joined to domain
   ansible.builtin.command: realm discover {{ ad_domain }}
@@ -187,13 +190,33 @@
     # rectify the issues of /etc/resolv.conf if required
 
 
+- name: Set fact with list of all redhat hosts
+  set_fact:
+    redhat_hosts: "{{ groups['redhat'] | list + groups | select('match', '^redhat_') | map('extract', groups) | flatten }}"
+    debian_hosts: "{{ groups['debian'] | list + groups | select('match', '^debian_') | map('extract', groups) | flatten }}"
+  when: debug
+
+- name: Get all hosts directly or indirectly under 'redhat'
+  debug:
+    msg: >
+      debian_hosts -> {{ debian_hosts }}
+      redhat_hosts -> {{ redhat_hosts }}
+
+      Debian -> {{ groups['debian'] }}
+      Redhat -> {{ groups['redhat'] }}
+
+      Current host {{ inventory_hostname }} is debian -> {{ inventory_hostname in groups['debian'] }}
+      Current host {{ inventory_hostname }} is redhat -> {{ inventory_hostname in groups['redhat'] }}
+  when: debug
+
 - name: On Debian machines, Enable Home Directory
   become: true
   ansible.builtin.command:
     cmd: >-
       pam-auth-update --enable mkhomedir
   register: result_pam_auth_update
-  when: ansible_hostname in groups['debian']
+  # when: inventory_hostname in groups['debian']
+  when: ansible_facts['os_family'] == 'Debian'
 
 - name: On Redhat machines, Enable Home Directory
   become: true
@@ -201,7 +224,8 @@
     cmd: >-
       authselect select sssd with-mkhomedir --force
   register: result_authselect_mkhomedir
-  when: ansible_hostname in groups['rhel']
+  # when: inventory_hostname in groups['redhat']
+  when: ansible_facts['os_family'] == 'RedHat'
 
 - name: "Permit [{{dba_ad_group}}@{{ad_domain}}] group for access"
   become: true

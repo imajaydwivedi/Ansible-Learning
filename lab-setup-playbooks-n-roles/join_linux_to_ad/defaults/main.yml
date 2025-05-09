@@ -6,10 +6,11 @@ common_packages:
   - adcli
   - oddjob
   - oddjob-mkhomedir
+  - chrony
 
 debian_packages:
   - packagekit
-  - chrony
+  # - chrony
   - sssd-tools
   - sssd-common
   - samba-common-bin
